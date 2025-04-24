@@ -1,5 +1,12 @@
 {
   "dependencies": {
-    "react-toastify": "^11.0.5"
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "deepl-node": "^1.17.3",
+    "react-toastify": "^11.0.5",
+    "web-vitals": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14"
   }
 }
