@@ -20,6 +20,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
+
+    {
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  }
+}
+
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
