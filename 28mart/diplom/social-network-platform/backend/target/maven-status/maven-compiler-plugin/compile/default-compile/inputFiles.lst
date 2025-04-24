@@ -1,0 +1,7 @@
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/SocialNetworkApplication.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/config/CorsConfig.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/config/JwtAuthenticationFilter.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/config/JwtConfig.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/config/JwtService.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/config/SecurityConfig.java
+/Users/oa/Desktop/diplom/social-network-platform/backend/src/main/java/com/socialnetwork/backend/controller/TestController.java

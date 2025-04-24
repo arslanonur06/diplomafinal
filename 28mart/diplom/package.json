@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "dev": "cd social-network-platform/frontend && npm run dev",
+    "dev:frontend": "cd social-network-platform/frontend && npm run dev",
+    "dev:backend": "cd social-network-platform/backend && npm run dev",
+    "dev:all": "npm-run-all --parallel dev:frontend dev:backend"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "uuid": "^11.1.0"
+  }
+}

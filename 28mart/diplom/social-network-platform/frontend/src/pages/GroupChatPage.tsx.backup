@@ -1,0 +1,497 @@
+import React, { useState, useEffect, useRef } from 'react'; // Removed useCallback as it's implicitly used by useEffect dependencies
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../services/supabase'; // Ensure correct path
+import { useAuth } from '../contexts/AuthContext'; // Ensure useAuth is imported
+import { FiUsers, FiSend, FiX, FiArrowLeft, FiMoreHorizontal } from 'react-icons/fi';
+import { format } from 'date-fns';
+// Use standard react-i18next hook
+import { useTranslation } from 'react-i18next';
+import LoadingSpinner from '../components/ui/LoadingSpinner'; // Ensure correct path (relative: ../components/ui/LoadingSpinner)
+import toast from 'react-hot-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog'; // Use the aliased path
+
+// Interfaces
+interface Profile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
+interface Message {
+  id: string;
+  created_at: string;
+  content: string;
+  user_id: string;
+  group_id: string;
+  profiles: Profile | null;
+}
+
+interface Group {
+  id: string;
+  name: string;
+}
+
+interface GroupMember {
+  id: string; // membership id
+  user_id: string;
+  group_id: string;
+  profiles: Profile | null;
+}
+
+// Format timestamp function
+const formatTime = (timestamp: string | null | undefined): string => {
+  if (!timestamp) return "";
+  try {
+    // 'p' typically formats as 'h:mm AM/PM'
+    return format(new Date(timestamp), 'p');
+  } catch (e) {
+    console.error("Error formatting time:", e);
+    return "Invalid date";
+  }
+};
+
+// MessageItem Component Props
+interface MessageItemProps {
+  message: Message;
+  isCurrentUser: boolean;
+  currentUserProfile?: { avatar_url: string | null | undefined; full_name: string | null | undefined };
+}
+
+// MessageItem Component
+const MessageItem: React.FC<MessageItemProps> = React.memo(({ message, isCurrentUser, currentUserProfile }) => {
+  const { t } = useTranslation();
+  const profile = isCurrentUser ? currentUserProfile : message.profiles;
+  const name = profile?.full_name || (isCurrentUser ? 'You' : t('unknown_user'));
+  const avatar = profile?.avatar_url || '/default-avatar.png';
+
+  return (
+    <div className={`flex items-end gap-2.5 ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
+      {!isCurrentUser && (
+        <img
+          src={avatar}
+          alt={name}
+          className="h-6 w-6 rounded-full flex-shrink-0 border border-gray-200 dark:border-gray-600 self-start mt-1"
+          onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
+        />
+      )}
+      <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} max-w-[75%]`}>
+        {!isCurrentUser && profile && (
+          <span className="text-xs font-medium mb-0.5 text-indigo-600 dark:text-indigo-400 ml-1">
+            {name}
+          </span>
+        )}
+        <div
+          className={`px-3.5 py-2 shadow-sm break-words text-sm ${ 
+            isCurrentUser
+            ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl rounded-br-sm'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl rounded-bl-sm'
+          }`}
+        >
+          <p className="whitespace-pre-wrap">{message.content}</p>
+          <span className={`text-[10px] mt-1 ${isCurrentUser ? 'text-indigo-100/80' : 'text-gray-500 dark:text-gray-400'} ${isCurrentUser ? 'text-right' : 'text-left'} block opacity-80`}>
+            {formatTime(message.created_at)}
+          </span>
+        </div>
+      </div>
+      {isCurrentUser && (
+        <img
+          src={avatar}
+          alt={name}
+          className="h-6 w-6 rounded-full flex-shrink-0 border border-gray-200 dark:border-gray-600 self-start mt-1 ml-1"
+          onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
+        />
+      )}
+    </div>
+  );
+});
+MessageItem.displayName = 'MessageItem';
+
+// GroupChatPage Component
+const GroupChatPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [groupInfo, setGroupInfo] = useState<Group | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [fetchMembersError, setFetchMembersError] = useState<string | null>(null);
+
+  // Fetch initial messages and group info
+  const fetchInitialData = async () => {
+    if (!id) {
+        setError(t('error_invalid_group_id'));
+        setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+      try {
+        const { data: groupData, error: groupError } = await supabase
+          .from('groups')
+        .select('id, name')
+          .eq('id', id)
+          .single();
+
+      if (groupError) {
+        if (groupError.code === 'PGRST116') {
+            throw new Error(t('error_group_not_found'));
+        }
+        throw groupError;
+      }
+      setGroupInfo(groupData as Group);
+
+      const { data: messageData, error: messageError } = await supabase
+        .from('messages')
+          .select(`
+          id, created_at, content, user_id, group_id,
+          profiles ( id, full_name, avatar_url )
+          `)
+          .eq('group_id', id)
+          .order('created_at', { ascending: true });
+
+      if (messageError) throw messageError;
+      setMessages((messageData || []).map(m => {
+        // Supabase sometimes returns profile data inconsistently. Handle both object and array cases.
+        let profile: Profile | null = null;
+        const profilesData = m.profiles as unknown; // Cast to unknown first
+        if (profilesData) {
+            if (Array.isArray(profilesData) && profilesData.length > 0) {
+                profile = profilesData[0] as Profile; // Cast the element
+            } else if (!Array.isArray(profilesData)) {
+                profile = profilesData as Profile; // Cast the object
+            }
+        }
+        return { ...m, profiles: profile } as Message;
+      }));
+
+    } catch (err: any) {
+      console.error('Error fetching initial data:', err);
+      setError(err.message || t('error_loading_chat'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  useEffect(() => {
+    if (!user) {
+        navigate('/login');
+        return;
+    }
+    fetchInitialData();
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, navigate, id, t]); // id and t are dependencies now
+
+  // Fetch group members
+  const fetchGroupMembers = async () => { // Removed useCallback as it's called conditionally
+    if (!id) return;
+    try {
+      setLoadingMembers(true);
+      setFetchMembersError(null);
+      const { data: membersData, error: membersError } = await supabase
+        .from('group_members')
+        .select(`
+          id, user_id, group_id,
+          profiles ( id, full_name, avatar_url )
+        `)
+        .eq('group_id', id);
+
+      if (membersError) throw membersError;
+      setGroupMembers((membersData || []).map(m => {
+        // Same profile handling as in fetchInitialData
+        let profile: Profile | null = null;
+        const profilesData = m.profiles as unknown; // Cast to unknown first
+        if (profilesData) {
+            if (Array.isArray(profilesData) && profilesData.length > 0) {
+                profile = profilesData[0] as Profile; // Cast the element
+            } else if (!Array.isArray(profilesData)) {
+                profile = profilesData as Profile; // Cast the object
+            }
+        }
+        return { ...m, profiles: profile } as GroupMember;
+      }));
+    } catch (err: any) {
+      console.error('Error fetching group members:', err);
+      setFetchMembersError(t('error_loading_members'));
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  // Fetch members when modal is shown for the first time
+  useEffect(() => {
+    if (showMembersModal && groupMembers.length === 0 && !loadingMembers) {
+      fetchGroupMembers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMembersModal, groupMembers.length, loadingMembers, id, t]); // Added dependencies
+
+  // Real-time message subscription
+  useEffect(() => {
+    if (!id) return;
+
+    const channel = supabase.channel(`group_chat_${id}`)
+      .on<Message>(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `group_id=eq.${id}` },
+        async (payload) => {
+          console.log('New message received:', payload);
+          let newMessage = payload.new;
+
+          if (!newMessage.profiles) {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('id, full_name, avatar_url')
+              .eq('id', newMessage.user_id)
+              .single();
+
+            if (!profileError && profileData) {
+              newMessage = { ...newMessage, profiles: profileData as Profile };
+            } else {
+              console.warn('Could not fetch profile for new message:', profileError);
+              newMessage = { ...newMessage, profiles: null };
+            }
+          }
+           setMessages((prevMessages) => {
+            if (prevMessages.some(msg => msg.id === newMessage.id)) {
+                return prevMessages;
+            }
+            return [...prevMessages, newMessage as Message];
+           });
+        }
+      )
+      .subscribe((status) => {
+         if (status === 'SUBSCRIBED') {
+            console.log(`Subscribed to group_chat_${id}`);
+         } else if (status === 'CHANNEL_ERROR') {
+            console.error(`Subscription error on channel group_chat_${id}`);
+            setError(t('error_realtime_connection'));
+         }
+      });
+
+    return () => {
+      supabase.removeChannel(channel).then(status => console.log(`Unsubscribed from group_chat_${id}:`, status));
+    };
+  }, [id, t]);
+
+  // Handle sending messages
+  const handleSendMessage = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newMessage.trim() || !user || !id) return;
+
+    const content = newMessage.trim();
+    setNewMessage('');
+    
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({ content, user_id: user.id, group_id: id });
+        
+      if (error) throw error;
+      
+    } catch (err: any) {
+      console.error('Error sending message:', err);
+      toast.error(t('error_sending_message'));
+      setNewMessage(content);
+    }
+  };
+
+  // Scroll to bottom effect
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Loading state
+  if (loading && messages.length === 0) {
+    return (
+        <div className="flex justify-center items-center h-full">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error && !groupInfo) {
+    return (
+        <div className="p-4 text-center">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
+          <button
+             onClick={() => navigate('/groups')}
+             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+          >
+            {t('back_to_groups')}
+          </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900">
+      {/* Header - Updated Styling */}
+      <header className="flex-shrink-0 flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 sticky top-0 z-10">
+         {/* Back Navigation */}
+         <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
+             <FiArrowLeft size={20} />
+         </button>
+         {/* Group Info */}
+         <div className="flex flex-col items-center flex-1 min-w-0 px-2">
+           <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+               {groupInfo?.name || t('group_chat')}
+           </h1>
+           {/* Optionally show member count here if needed, or keep it in the button */}
+           {/* <span className="text-xs text-gray-500 dark:text-gray-400">{groupMembers.length} members</span> */}
+         </div>
+         {/* Members Button - Now uses DialogTrigger */}
+         <Dialog open={showMembersModal} onOpenChange={setShowMembersModal}>
+           <DialogTrigger asChild>
+             <button
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-150 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex-shrink-0"
+              aria-label={t('view_group_members')}
+            >
+              <FiUsers size={20} />
+              {groupMembers.length > 0 && (
+                <span className="ml-1.5 text-xs font-medium">({groupMembers.length})</span>
+              )}
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t('group_members')} ({groupMembers.length})</DialogTitle>
+              {/* Optional: Add a description if needed */}
+              {/* <DialogDescription>
+                List of members in this group.
+              </DialogDescription> */}
+            </DialogHeader>
+            {/* Modal Body - Member List */}
+            <div className="overflow-y-auto max-h-[60vh] p-4 space-y-3"> {/* Adjusted padding and max-height */}
+              {loadingMembers ? (
+                <div className="flex justify-center py-4"><LoadingSpinner /></div>
+              ) : groupMembers.length > 0 ? (
+                groupMembers.map((member) => (
+                  <div key={member.user_id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <img
+                      src={member.profiles?.avatar_url || '/default-avatar.png'}
+                      alt={member.profiles?.full_name || t('unknown_user')}
+                      className="h-10 w-10 rounded-full border border-gray-200 dark:border-gray-600 flex-shrink-0"
+                      onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
+                    />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {member.profiles?.full_name || t('unknown_user')}
+                    </span>
+                    {/* Maybe add a link to their profile later? */}
+            </div>
+                ))
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('no_members_found')}</p>
+              )}
+              {fetchMembersError && (
+                 <p className="text-red-500 dark:text-red-400 text-center mt-2 text-sm">{fetchMembersError}</p>
+              )}
+            </div>
+             {/* Optional: Add a footer with a close button if needed, though clicking outside or Esc works */}
+            {/* <DialogFooter>
+              <DialogClose asChild>
+                <button type="button" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded">
+                  Close
+                </button>
+              </DialogClose>
+            </DialogFooter> */}
+          </DialogContent>
+        </Dialog>
+      </header>
+
+      {/* Chat Messages Area - MODIFIED: Adjusted padding */}
+      <main className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-1">
+        {error && groupInfo && (
+           <p className="text-red-500 dark:text-red-400 text-center text-sm mb-2">{error}</p>
+        )}
+        {loading && messages.length === 0 && (
+           <div className="flex justify-center pt-4"><LoadingSpinner /></div>
+        )}
+        {!loading && messages.length === 0 && (
+          <p className="text-gray-500 dark:text-gray-400 text-center pt-4">{t('no_messages_yet')}</p>
+        )}
+        {!loading && messages.length > 0 && messages.map((message) => (
+          <MessageItem
+            key={message.id}
+            message={message}
+            isCurrentUser={message.user_id === user?.id}
+            currentUserProfile={message.user_id === user?.id ? {
+              avatar_url: user?.user_metadata?.avatar_url,
+              full_name: user?.user_metadata?.full_name
+            } : undefined}
+          />
+        ))}
+        <div ref={messagesEndRef} />
+      </main>
+
+      {/* Message Input Area - MODIFIED Styling */}
+      <footer className="flex-shrink-0 p-2 sm:p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850">
+        <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+          {/* MODIFIED: Input styling - more padding, slightly larger */}
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder={t('type_a_message')}
+            className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm transition duration-150 ease-in-out"
+            disabled={!user}
+          />
+          {/* MODIFIED: Send button styling - consistent size, gradient */}
+          <button
+            type="submit"
+            disabled={!newMessage.trim() || !user}
+            className={`h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0 transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-850 ${newMessage.trim() && user
+              ? 'bg-gradient-to-br from-indigo-500 to-purple-600 hover:opacity-90 text-white shadow-md'
+              : 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+            }`}
+            aria-label={t('send_message')}
+          >
+            <FiSend size={18} />
+          </button>
+        </form>
+      </footer>
+
+      {/* Members Modal - Replaced with Shadcn Dialog above */}
+      {/* {showMembersModal && ( ... old modal code removed ... )} */}
+    </div>
+  );
+};
+
+export default GroupChatPage;
+
+// Add this to your CSS/Tailwind config for the modal animation if desired:
+/*
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-modal-appear {
+  animation: modal-appear 0.3s ease-out;
+}
+*/

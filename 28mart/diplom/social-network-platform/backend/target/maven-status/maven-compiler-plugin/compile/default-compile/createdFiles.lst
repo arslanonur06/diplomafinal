@@ -1,0 +1,7 @@
+com/socialnetwork/backend/SocialNetworkApplication.class
+com/socialnetwork/backend/config/JwtConfig.class
+com/socialnetwork/backend/config/CorsConfig.class
+com/socialnetwork/backend/config/JwtService.class
+com/socialnetwork/backend/config/SecurityConfig.class
+com/socialnetwork/backend/controller/TestController.class
+com/socialnetwork/backend/config/JwtAuthenticationFilter.class

@@ -1,0 +1,118 @@
+{
+  "common": {
+    "skip": "Skip for now",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "present": "Present"
+  },
+  "post": {
+    "create": "Create Post",
+    "creating": "Creating...",
+    "delete": "Delete Post",
+    "deleting": "Deleting...",
+    "placeholder": "What's on your mind?",
+    "addImage": "Add Image",
+    "removeImage": "Remove Image"
+  },
+  "profile": {
+    "fullName": "Full Name",
+    "enterFullName": "Enter your full name",
+    "headline": "Professional Headline",
+    "enterHeadline": "Enter your professional headline",
+    "bio": "Bio",
+    "enterBio": "Tell us about yourself",
+    "location": "Location",
+    "country": "Country",
+    "selectCountry": "Select your country",
+    "city": "City",
+    "selectCity": "Select your city",
+    "interests": "Interests",
+    "selectInterests": "Select your interests",
+    "completing": "Completing Profile...",
+    "completeProfile": "Complete Profile",
+    "completeProfileDesc": "Let's set up your profile to help you connect with others",
+    "experience": "Experience",
+    "education": "Education",
+    "error": {
+      "required": "This field is required",
+      "maxTags": "Maximum number of interests is %{max}",
+      "invalidCountry": "Please select a valid country",
+      "invalidCity": "Please select a valid city",
+      "fullNameRequired": "Full name is required",
+      "cityRequired": "Please select your city",
+      "submitFailed": "Failed to complete profile",
+      "skipFailed": "Failed to skip profile completion"
+    },
+    "success": {
+      "profileCompleted": "Profile completed successfully!",
+      "skipped": "Profile completion skipped. You can complete it later."
+    }
+  },
+  "error": {
+    "fetchProfile": "Failed to fetch profile",
+    "fetchPosts": "Failed to fetch posts",
+    "createPost": "Failed to create post",
+    "deletePost": "Failed to delete post",
+    "updateFailed": "Failed to update"
+  },
+  "success": {
+    "postCreated": "Post created successfully",
+    "postDeleted": "Post deleted successfully",
+    "profileUpdate": "Profile updated successfully",
+    "experienceUpdated": "Experience updated successfully",
+    "educationUpdated": "Education updated successfully"
+  },
+  "group_chat": {
+    "loading": "Loading...",
+    "no_messages_yet": "No messages yet. Be the first to send a message!",
+    "type_a_message": "Type a message...",
+    "send_message": "Send Message",
+    "back_to_messages": "Back to Messages",
+    "back_to_groups": "Back to Groups",
+    "error_loading_members": "Error loading group members",
+    "error_sending_message": "Failed to send message. Please try again.",
+    "error_realtime_connection": "Error connecting to real-time updates",
+    "group_members": "Members",
+    "unknown_user": "Unknown User",
+    "no_members_found": "No members found",
+    "mute_notifications": "Mute Notifications",
+    "view_group_info": "View Group Info",
+    "create_event": "Create Event",
+    "leave_group": "Leave Group",
+    "chat_settings": "Chat Settings",
+    "view_group_members": "View Group Members",
+    "enter_fullscreen": "Enter Fullscreen",
+    "exit_fullscreen": "Exit Fullscreen",
+    "not_a_member": "You are not a member of this group.",
+    "join_group": "Join Group",
+    "join_to_send_messages": "Join the group to send messages",
+    "error_joining_group": "Failed to join group. Please try again.",
+    "joined_group_success": "Successfully joined the group!"
+  },
+  "interests": {
+    "categories": {
+      "technology": "Technology",
+      "business": "Business",
+      "arts": "Arts",
+      "science": "Science",
+      "sports": "Sports",
+      "lifestyle": "Lifestyle"
+    }
+  },
+  "locations": {
+    "countries": {
+      "kazakhstan": "Kazakhstan",
+      "russia": "Russia", 
+      "usa": "United States",
+      "uk": "United Kingdom",
+      "germany": "Germany",
+      "france": "France",
+      "china": "China",
+      "japan": "Japan",
+      "canada": "Canada",
+      "australia": "Australia"
+    }
+  }
+}

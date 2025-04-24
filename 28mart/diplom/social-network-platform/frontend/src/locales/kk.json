@@ -1,0 +1,634 @@
+{
+  "buttons": {
+    "save": "Сақтау",
+    "cancel": "Болдырмау",
+    "post": "Жариялау",
+    "posting": "Жариялануда...",
+    "edit": "Өңдеу",
+    "delete": "Жою",
+    "like": "Ұнату",
+    "comment": "Пікір жазу",
+    "share": "Бөлісу",
+    "unsave": "Сақтаудан алу",
+    "login": "Кіру",
+    "createPost": "Жазба жасау",
+    "close": "Жабу",
+    "postComment": "Пікір жіберу",
+    "message": "Хабарлама",
+    "sending": "Жіберілуде...",
+    "addFriend": "Досқа қосу",
+    "requestSent": "Өтініш жіберілді",
+    "friends": "Достар",
+    "confirm": "Растау",
+    "saved": "Сақталды",
+    "send": "Жіберу",
+    "tryAgain": "Қайталау",
+    "remove": "Жою",
+    "view": "Көру",
+    "saving": "Сақталуда...",
+    "deleting": "Жойылуда...",
+    "saveProfile": "Профильді сақтау"
+  },
+  "formLabels": {
+    "school": "Мектеп",
+    "degree": "Диплом",
+    "field": "Сала",
+    "startDate": "Басталу күні",
+    "endDate": "Аяқталу күні",
+    "currentlyStudying": "Қазір осында оқиды",
+    "description": "Сипаттама"
+  },
+  "profile": {
+    "incompleteProfile": "Толық емес профиль",
+    "completeProfileMessage": "Жазба жасау үшін профиліңізді толтырыңыз",
+    "editProfile": "Профильді өңдеу →",
+    "yourProfile": "Сіздің профиліңіз",
+    "confirmDeletePost": "Бұл жазбаны жойғыңыз келетініне сенімдісіз бе?",
+    "postDeletedSuccess": "Жазба сәтті жойылды.",
+    "postDeleteFailed": "Жазбаны жою сәтсіз аяқталды.",
+    "friendRequestSent": "Достық сұранысы жіберілді!",
+    "friendRequestFailed": "Достық сұранысын жіберу сәтсіз аяқталды.",
+    "confirmRemoveFriend": "Бұл досты жойғыңыз келетініне сенімдісіз бе?",
+    "friendRemovedSuccess": "Дос жойылды.",
+    "friendRemoveFailed": "Досты жою сәтсіз аяқталды.",
+    "friendRequestAccepted": "Достық сұранысы қабылданды!",
+    "friendRequestAcceptFailed": "Достық сұранысын қабылдау сәтсіз аяқталды.",
+    "buttons": {
+      "addFriend": "Досқа қосу",
+      "accept": "Қабылдау",
+      "decline": "Бас тарту",
+      "removeFriend": "Достықтан шығару",
+      "viewGroup": "Топты қарау",
+      "createGroup": "Топ құру",
+      "viewDetails": "Мәліметтерді қарау",
+      "createEvent": "Оқиға құру",
+      "findFriends": "Достарды табу",
+      "editProfile": "Профильді өңдеу"
+    },
+    "status": {
+        "requestSent": "Сұраныс жіберілді"
+    },
+    "noPostsYet": "Сіздің әлі жазбаңыз жоқ.",
+    "userHasNoPostsSuffix": "атты пайдаланушының жазбасы жоқ.",
+    "noGroupsJoined": "Сіз әлі ешбір топқа қосылмадыңыз немесе құрмадыңыз.",
+    "userNotInGroupsSuffix": "атты пайдаланушы ешбір топтың мүшесі емес.",
+    "noEventsJoined": "Сіз әлі ешбір оқиғаға қосылмадыңыз немесе құрмадыңыз.",
+    "userNotInEventsSuffix": "атты пайдаланушы ешбір оқиғамен байланысты емес.",
+    "noFriendsYet": "Сіз әлі дос қоспадыңыз.",
+    "userHasNoFriendsSuffix": "атты пайдаланушының көрсететін досы жоқ.",
+    "noSavedItems": "Сіз әлі ешбір элементті сақтамадыңыз.",
+    "tabs": {
+      "posts": "Жазбалар",
+      "groups": "Топтар",
+      "events": "Оқиғалар",
+      "friends": "Достар",
+      "saved": "Сақталғандар"
+    },
+    "notFound": "Профиль табылмады."
+  },
+  "post": {
+    "createPostPlaceholder": "Ойыңызда не бар?",
+    "createTitle": "Жазба жасау",
+    "submit": "Жариялау",
+    "addImage": "Сурет қосу",
+    "publish": "Жариялау",
+    "share": "Бөлісу",
+    "save": "Сақтау",
+    "unsave": "Сақтаудан алу",
+    "writePost": "Ойыңызда не бар?",
+    "post": "Жариялау",
+    "postingToGroup": "Топқа жариялау",
+    "postingToEvent": "Оқиғаға жариялау",
+    "selectGroup": "Жариялау үшін топты таңдаңыз",
+    "selectEvent": "Жариялау үшін оқиғаны таңдаңыз",
+    "popularHashtags": "Танымал хэштегтер",
+    "tagLocation": "Орынды белгілеу",
+    "addVideo": "Бейне қосу",
+    "addEmoji": "Эмодзи қосу",
+    "selectFriend": "Доспен бөлісу",
+    "sharingWithFriend": "Бөлісетін адам"
+  },
+  "errors": {
+    "incompleteProfile": "Алдымен профиліңізді толтырыңыз",
+    "loginRequired": "Жазба жасау үшін кіріңіз",
+    "postCreationFailed": "Жазба жасау сәтсіз аяқталды",
+    "completeProfileToPost": "Жазба жазуды бастау үшін профиліңізді толтырыңыз",
+    "loginRequiredGroup": "Топ құру үшін жүйеге кіруіңіз керек.",
+    "groupNameRequired": "Топ атауы міндетті.",
+    "groupCategoryRequired": "Топ үшін санат таңдаңыз.",
+    "groupCreationFailed": "Топты құру сәтсіз аяқталды",
+    "groupMemberAddFailed": "Топ құрылды, бірақ құрушыны мүше ретінде қосу сәтсіз аяқталды.",
+    "loginRequiredEvent": "Оқиға құру үшін жүйеге кіруіңіз керек.",
+    "eventNameRequired": "Оқиға тақырыбы міндетті.",
+    "eventDateRequired": "Оқиғаның басталу күні міндетті.",
+    "eventCategoryRequired": "Оқиға үшін санат таңдаңыз.",
+    "eventCreationFailed": "Оқиғаны құру сәтсіз аяқталды"
+  },
+  "success": {
+    "postCreated": "Жазба сәтті жасалды",
+    "groupCreated": "Топ сәтті құрылды!",
+    "eventCreated": "Оқиға сәтті құрылды!"
+  },
+  "group_chat": {
+    "loading": "Жүктелуде...",
+    "no_messages_yet": "Әзірге хабарламалар жоқ. Бірінші хабарламаны жіберіңіз!",
+    "type_a_message": "Хабарлама жазыңыз...",
+    "send_message": "Жіберу",
+    "back_to_messages": "Хабарламаларға оралу",
+    "back_to_groups": "Топтарға оралу",
+    "error_loading_members": "Топ мүшелерін жүктеу кезінде қате",
+    "error_sending_message": "Хабарлама жіберу сәтсіз аяқталды. Қайталап көріңіз.",
+    "error_realtime_connection": "Нақты уақыт байланысында қате",
+    "group_members": "Мүшелер",
+    "unknown_user": "Белгісіз пайдаланушы",
+    "no_members_found": "Мүшелер табылмады",
+    "mute_notifications": "Хабарландыруларды өшіру",
+    "view_group_info": "Топ туралы ақпаратты көру",
+    "create_event": "Оқиға жасау",
+    "leave_group": "Топтан шығу",
+    "chat_settings": "Чат параметрлері",
+    "view_group_members": "Топ мүшелерін көру",
+    "enter_fullscreen": "Толық экран",
+    "exit_fullscreen": "Толық экраннан шығу"
+  },
+  "settings": {
+    "title": "Параметрлер",
+    "account": "Тіркелгі параметрлері",
+    "profile": "Профиль параметрлері",
+    "notifications": "Хабарландыру параметрлері",
+    "privacy": "Құпиялылық параметрлері",
+    "language": "Тіл параметрлері",
+    "theme": "Тақырып параметрлері",
+    "deleteAccount": "Тіркелгіні жою",
+    "darkMode": "Қараңғы режим",
+    "emailNotifications": "Электрондық пошта хабарландырулары",
+    "pushNotifications": "Push хабарландырулар",
+    "profileVisibility": "Профиль көрінуі",
+    "postVisibility": "Жазба көрінуі",
+    "messagePermissions": "Хабарлама рұқсаттары",
+    "selectLanguage": "Тілді таңдау",
+    "public": "Жалпыға ортақ",
+    "private": "Жеке",
+    "everyone": "Барлығы",
+    "connections": "Тек байланыстар",
+    "nobody": "Ешкім",
+    "pageTitle": "Параметрлер",
+    "tabs": {
+      "profile": "Профиль",
+      "appearance": "Сыртқы көрініс",
+      "notifications": "Хабарландырулар",
+      "privacy": "Құпиялылық",
+      "security": "Қауіпсіздік",
+      "account": "Тіркелгі",
+      "help": "Анықтама & Қолдау"
+    },
+    "profile": {
+      "title": "Профиль ақпараты",
+      "fullNameLabel": "Толық аты",
+      "emailLabel": "Электрондық пошта мекенжайы"
+    },
+    "notifications": {
+      "title": "Хабарландырулар",
+      "emailLabel": "Электрондық пошта хабарландырулары",
+      "emailDescription": "Маңызды жаңартуларды электрондық пошта арқылы алыңыз.",
+      "pushLabel": "Push хабарландырулар",
+      "pushDescription": "Тікелей қолданбада хабарландыру алыңыз (браузер рұқсаты қажет).",
+      "marketingLabel": "Маркетингтік хаттар",
+      "marketingDescription": "Жарнамалық ұсыныстар мен жаңалықтарды алыңыз.",
+      "saveButton": "Хабарландыруларды сақтау"
+    },
+    "privacy": {
+      "title": "Құпиялылық параметрлері",
+      "profileVisibilityLabel": "Профиль көрінуі",
+      "visibilityOptions": {
+        "public": "Жалпыға ортақ (Барлығы көре алады)",
+        "connections": "Тек байланыстар",
+        "private": "Жеке (Тек сіз)"
+      },
+      "showEmailLabel": "Электрондық поштаны профильде көрсету",
+      "showLocationLabel": "Орналасқан жерді профильде көрсету",
+      "saveButton": "Құпиялылық параметрлерін сақтау"
+    },
+    "appearance": {
+      "title": "Сыртқы көрініс",
+      "themeLabel": "Тақырып",
+      "lightTheme": "Ашық",
+      "darkTheme": "Қараңғы"
+    },
+    "security": {
+      "title": "Қауіпсіздік",
+      "changePasswordTitle": "Құпия сөзді өзгерту",
+      "newPasswordLabel": "Жаңа құпия сөз",
+      "confirmPasswordLabel": "Жаңа құпия сөзді растау",
+      "changePasswordButton": "Құпия сөзді өзгерту",
+      "accountActionsTitle": "Тіркелгі әрекеттері",
+      "logoutButton": "Шығу",
+      "deleteAccountButton": "Тіркелгіні жою",
+      "deleteWarning": "Ескерту: Тіркелгіні жою әрекеті қайтарылмайды."
+    },
+    "help": {
+      "title": "Анықтама & Қолдау",
+      "description": "Көмек қажет пе немесе сұрақтарыңыз бар ма? Нұсқаулықтар мен ЖҚС үшін Анықтама орталығымызға кіріңіз.",
+      "helpCenterButton": "Анықтама орталығына өту"
+    },
+    "account": {
+      "title": "Тіркелгіні басқару",
+      "manageSessionsButton": "Кіру сеанстарын басқару",
+      "managePasswordButton": "Құпия сөзді басқару (OAuth?)",
+      "deactivateButton": "Тіркелгіні өшіру (Уақытша)",
+      "deletePermanentlyButton": "Тіркелгіні біржола жою"
+    },
+    "logoutButton": "Шығу"
+  },
+  "comments": {
+    "title": "Пікірлер",
+    "noComments": "Әзірге пікірлер жоқ",
+    "writeCommentPlaceholder": "Пікір жазу..."
+  },
+  "common": {
+    "welcome": "Біздің әлеуметтік желімізге қош келдіңіз",
+    "loginPrompt": "Жазбаларды көру және олармен әрекеттесу үшін кіріңіз",
+    "loading": "Жүктелуде...",
+    "using_mock_data": "Тест деректері қолданылуда",
+    "use_real_data": "Нақты деректерді қолдану",
+    "more_options": "Көбірек опциялар",
+    "select_tab": "Қойындыны таңдаңыз"
+  },
+  "login": {
+    "signIn": "Кіру",
+    "signInWithGoogle": "Google арқылы кіру",
+    "signingIn": "Кіру...",
+    "welcomeBack": "Қайта қош келдіңіз",
+    "dontHaveAccount": "Тіркелгіңіз жоқ па?",
+    "register": "Тіркелу",
+    "emailAddress": "Электрондық пошта мекенжайы",
+    "emailPlaceholder": "siz@example.com",
+    "password": "Құпия сөз",
+    "passwordPlaceholder": "••••••••",
+    "rememberMe": "Мені есте сақтау",
+    "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
+    "failedToSignIn": "Кіру сәтсіз аяқталды",
+    "failedToSignInWithGoogle": "Google арқылы кіру сәтсіз аяқталды",
+    "loginFailed": "Кіру сәтсіз аяқталды",
+    "redirectTimeout": "Бағыттау уақыты өтті - қайталап көріңіз",
+    "redirectingToGoogle": "Аутентификация үшін Google-ға бағытталуда...",
+    "loginFailedTryAgain": "Кіру сәтсіз аяқталды. Қайталап көріңіз.",
+    "redirectingToOAuth": "Аутентификация қызметіне бағытталуда...",
+    "signInToAccount": "Тіркелгіңізге кіріңіз",
+    "connectWithCommunity": "Қауымдастығыңызбен және достарыңызбен байланысыңыз"
+  },
+  "navigation": {
+    "landingPage": "Бастапқы бет",
+    "joinNow": "Қазір қосылу",
+    "goToCompleteProfile": "Профильді толтыруға өту",
+    "orContinueWithEmail": "Немесе электрондық поштамен жалғастырыңыз"
+  },
+  "footer": {
+    "allRightsReserved": "Барлық құқықтар қорғалған"
+  },
+  "notifications": {
+    "title": "Хабарландырулар",
+    "markAsRead": "Оқылған деп белгілеу",
+    "markAllAsRead": "Барлығын оқылған деп белгілеу",
+    "deleteAll": "Барлығын жою",
+    "empty": "Көрсетілетін хабарландырулар жоқ",
+    "all": "Барлығы",
+    "unread": "Оқылмаған",
+    "friends": "Достар",
+    "likes": "Ұнатулар",
+    "comments": "Пікірлер",
+    "groups": "Топтар",
+    "events": "Оқиғалар"
+  },
+  "action": {
+    "completeNow": "Қазір толтыру"
+  },
+  "placeholder": {
+    "shareThoughts": "Ойыңызда не бар?"
+  },
+  "sidebar": {
+    "main": "Негізгі",
+    "home": "Басты бет",
+    "profile": "Профиль",
+    "groups": "Топтар",
+    "events": "Оқиғалар",
+    "shortcuts": "Жылдам сілтемелер",
+    "friends": "Достар",
+    "messages": "Хабарламалар",
+    "resources": "Ресурстар",
+    "discover": "Жаңалықтар",
+    "saved": "Сақталған",
+    "favorites": "Таңдаулылар",
+    "settings": "Параметрлер"
+  },
+  "friends": {
+    "title": "Достар",
+    "requests": "Өтініштер",
+    "suggestions": "Ұсыныстар",
+    "no_friends": "Әзірше достарыңыз жоқ. Оларды Ұсыныстар бөлімінен табыңыз!",
+    "no_requests": "Күтудегі өтініштер жоқ.",
+    "no_suggestions": "Қазір ұсыныстар жоқ. Кейінірек тексеріңіз!",
+    "incoming": "Кіріс",
+    "sent": "Жіберілген",
+    "actions": {
+      "accept": "Қабылдау",
+      "decline": "Бас тарту",
+      "cancel_request": "Өтінішті болдырмау",
+      "connect": "Қосылу",
+      "message": "Хабарлама",
+      "view_profile": "Профильді қарау"
+    },
+    "buttons": {
+      "createGroup": "Топ құру",
+      "findPeople": "Адамдарды іздеу",
+      "accept": "Қабылдау",
+      "decline": "Бас тарту",
+      "cancel": "Болдырмау",
+      "connect": "Қосылу",
+      "addFriend": "Досқа қосу"
+    },
+    "tabs": {
+      "friends": "Достар",
+      "requests": "Өтініштер",
+      "people": "Адамдар"
+    },
+    "no_friends_message": "Сіздің әлі достарыңыз жоқ. Қосылатын адамдарды табыңыз!",
+    "incoming_requests": "Келіп түскен өтініштер",
+    "sent_requests": "Жіберілген өтініштер",
+    "no_pending_requests": "Күтудегі дос болу өтініштері жоқ",
+    "people_you_may_know": "Сіз тануы мүмкін адамдар",
+    "no_suggestions_message": "Қазіргі уақытта ұсыныстар жоқ",
+    "create_group_title": "Жаңа топ құру",
+    "create_group_description": "Жаңа тобыңызға қосу үшін достарды таңдаңыз",
+    "create_group_name_label": "Топ атауы",
+    "create_group_name_placeholder": "Топ атауын енгізіңіз...",
+    "create_group_select_label": "Достарды таңдау",
+    "create_group_selected": "таңдалды",
+    "requestPending": "Сұраныс күтуде",
+    "alreadyFriend": "Қазірдің өзінде дос"
+  },
+  "nav": {
+    "main": "Негізгі",
+    "shortcuts": "Жылдам сілтемелер",
+    "resources": "Ресурстар",
+    "home": "Басты бет",
+    "profile": "Профиль",
+    "groups": "Топтар",
+    "events": "Оқиғалар",
+    "friends": "Достар",
+    "messages": "Хабарламалар",
+    "chat": "Чат",
+    "notifications": "Хабарландырулар",
+    "discover": "Жаңалықтар",
+    "saved": "Сақталған",
+    "favorites": "Таңдаулылар",
+    "settings": "Параметрлер"
+  },
+  "home": {
+    "search_placeholder": "Жазбаларды іздеу...",
+    "no_posts_title": "Жазбалар табылмады",
+    "no_my_posts_message": "Сіз әлі жазба жасамадыңыз.",
+    "no_all_posts_message": "Көрсетілетін жазбалар жоқ.",
+    "create_first_post": "Алғашқы жазбаңызды жасаңыз"
+  },
+  "groups": {
+    "title": "Топтар",
+    "tabs": {
+      "all": "Барлық топтар",
+      "my": "Менің топтарым"
+    },
+    "buttons": {
+      "create": "Топ құру",
+      "joining": "Қосылуда...",
+      "join": "Топқа қосылу",
+      "chat": "Чат",
+      "leave": "Шығу"
+    },
+    "search_placeholder": "Өз қауымдастығыңызды табыңыз...",
+    "category_label": "Санат",
+    "categories": {
+      "all": "Барлығы",
+      "technology": "Технология",
+      "business": "Бизнес",
+      "education": "Білім",
+      "entertainment": "Ойын-сауық",
+      "health": "Денсаулық",
+      "sports": "Спорт",
+      "travel": "Саяхат",
+      "art": "Өнер",
+      "food": "Тамақ",
+      "music": "Музыка"
+    },
+    "members": "мүше",
+    "no_groups_found_title": "Топтар табылмады",
+    "no_my_groups_message": "Сіз әлі ешбір топқа қосылмадыңыз.",
+    "no_all_groups_message": "Іздеуді өзгертіп көріңіз немесе жаңа топ құрыңыз."
+  },
+  "events": {
+    "title": "Оқиғалар",
+    "tabs": {
+      "all": "Барлық оқиғалар",
+      "my": "Менің оқиғаларым"
+    },
+    "buttons": {
+      "create": "Оқиға құру",
+      "leaving": "Шығуда...",
+      "leave": "Шығу",
+      "chat": "Чат",
+      "joining": "Қосылуда...",
+      "join": "Қосылу"
+    },
+    "search_placeholder": "Оқиғаларды іздеу...",
+    "category_label": "Санатты таңдау",
+    "categories": {
+      "all": "Барлық санаттар",
+      "technology": "Технология",
+      "business": "Бизнес",
+      "education": "Білім",
+      "entertainment": "Ойын-сауық",
+      "health": "Денсаулық",
+      "sports": "Спорт",
+      "travel": "Саяхат",
+      "art": "Өнер",
+      "food": "Тамақ",
+      "music": "Музыка"
+    },
+    "public": "Жалпыға ортақ",
+    "private": "Жеке",
+    "no_events_found_title": "Оқиғалар табылмады",
+    "no_my_events_message": "Сіз әлі ешбір оқиғаға қосылмадыңыз.",
+    "no_all_events_message": "Іздеуді өзгертіп көріңіз немесе жаңа оқиға құрыңыз."
+  },
+  "messages": {
+    "title": "Хабарламалар",
+    "tabs": {
+      "direct": "Жеке",
+      "groups": "Топтар",
+      "events": "Оқиғалар"
+    },
+    "no_direct_messages": "Әлі жеке хабарлама жоқ",
+    "find_friends": "Достарды табу",
+    "delete_conversation": "Сұхбатты жою",
+    "group_chats_coming_soon": "Топтық чаттар жақында",
+    "browse_groups": "Топтарды қарау",
+    "no_event_chats": "Әлі оқиға чаты жоқ",
+    "browse_events": "Оқиғаларды қарау",
+    "exit_fullscreen": "Толық экраннан шығу",
+    "enter_fullscreen": "Толық экран",
+    "settings": "Хабарлама параметрлері",
+    "view_profile": "Профильді қарау",
+    "mute_notifications": "Хабарландыруларды өшіру",
+    "block_user": "Пайдаланушыны бұғаттау",
+    "select_conversation": "Сұхбатты таңдаңыз",
+    "select_conversation_description": "Тізімнен сұхбатты таңдаңыз немесе Достар бетінен жаңасын бастаңыз",
+    "you": "Сіз",
+    "no_messages_yet": "Әлі хабарлама жоқ"
+  },
+  "discover": {
+    "title": "Жаңалықтар",
+    "searchPlaceholder": "Адамдарды, топтарды немесе оқиғаларды іздеу...",
+    "tabs": {
+      "trending": "Трендтер",
+      "groups": "Топтар",
+      "events": "Оқиғалар",
+      "people": "Адамдар"
+    },
+    "buttons": {
+      "explore": "Көбірек қарау"
+    },
+    "eventDate": "Оқиға күні"
+  },
+  "saved": {
+    "title": "Сақталғандар",
+    "categories": {
+      "all": "Барлық элементтер",
+      "articles": "Мақалалар",
+      "photos": "Фотосуреттер",
+      "videos": "Бейнелер"
+    },
+    "readTime5": "5 мин оқу",
+    "readTime8": "8 мин оқу",
+    "no_items_title": "Сақталған элементтер табылмады",
+    "no_items_message": "Сіз сақтаған элементтер осында пайда болады. Мазмұнды қарап шығып, элементтерді сақтау үшін бетбелгі белгішесін басыңыз.",
+    "buttons": {
+      "explore": "Мазмұнды зерттеу"
+    }
+  },
+  "favorites": {
+    "title": "Таңдаулылар",
+    "tabs": {
+      "groups": "Топтар",
+      "connections": "Байланыстар"
+    },
+    "buttons": {
+        "remove": "Таңдаулылардан жою",
+        "viewGroup": "Топты қарау"
+    },
+    "noHeadline": "Тақырып жоқ",
+    "no_groups": "Сіз әлі ешбір топты таңдаулыларға қоспадыңыз.",
+    "no_connections": "Сіз әлі ешбір байланысты таңдаулыларға қоспадыңыз."
+  },
+  "helpAndSupport": {
+      "helpAndSupport": "Анықтама & Қолдау",
+      "helpAndSupportDescription": "Жиі қойылатын сұрақтарға жауап табыңыз және қолдау көрсету тобымызбен байланысыңыз.",
+      "telegramSupport": "Telegram қолдауы",
+      "telegramSupportDescription": "Telegram арқылы бізбен тікелей сөйлесіңіз.",
+      "emailSupport": "Электрондық пошта қолдауы",
+      "emailSupportDescription": "Көмек алу үшін бізге электрондық хат жіберіңіз.",
+      "helpCenter": "Анықтама орталығы",
+      "helpCenterDescription": "Біздің білім базамыздан жауаптарды табыңыз.",
+      "documentation": "Құжаттама",
+      "documentationDescription": "Жан-жақты нұсқаулықтарды қарап шығыңыз.",
+      "viewDocumentation": "Құжаттаманы көру",
+      "videoTutorials": "Бейне нұсқаулықтар",
+      "videoTutorialsDescription": "Бастау үшін бейнелерімізді көріңіз.",
+      "watchTutorials": "Нұсқаулықтарды көру",
+      "frequentlyAskedQuestions": "Жиі қойылатын сұрақтар",
+      "noMatchingFAQs": "Сәйкес келетін ЖҚС табылмады.",
+      "openingTelegram": "Telegram қолдауы ашылуда",
+      "openingEmail": "Электрондық пошта клиенті ашылуда",
+      "redirectingToHelp": "Анықтама орталығына бағытталуда...",
+      "redirectingToDocs": "Құжаттама ашылуда...",
+      "redirectingToTutorials": "Нұсқаулықтар ашылуда..."
+  },
+  "faq": {
+      "createGroup": {
+          "question": "Топты қалай құрамын?",
+          "answer": "Топтар бетіне өтіп, \"Топ құру\" түймесін басыңыз. Мәліметтерді толтырып, мүшелерді шақырыңыз."
+      },
+      "addFriends": {
+          "question": "Достарды қалай қосамын?",
+          "answer": "Достар бетіне өтіп, \"Ұсыныстар\" бөлімінен адамдарды табыңыз немесе іздеңіз және \"Қосылу\" немесе \"Досқа қосу\" түймесін басыңыз."
+      },
+      "privacy": {
+          "question": "Құпиялылық параметрлерін қалай басқарамын?",
+          "answer": "Параметрлер -> Құпиялылық бөліміне өтіңіз. Мұнда профиліңізді және жазбаларыңызды кім көре алатынын басқара аласыз."
+      },
+      "notifications": {
+          "question": "Хабарландыру параметрлерін қалай өзгертемін?",
+          "answer": "Электрондық пошта және push хабарландыруларды қосу немесе өшіру үшін Параметрлер -> Хабарландырулар бөліміне кіріңіз."
+      },
+      "deleteAccount": {
+          "question": "Тіркелгімді қалай жоямын?",
+          "answer": "Параметрлер -> Қауіпсіздік -> Тіркелгі әрекеттері бөліміне өтіңіз. Тіркелгіні жою әрекетінің қайтарылмайтынын ескеріңіз."
+      }
+  },
+  "actions": {
+    "accept": "Қабылдау",
+    "decline": "Бас тарту",
+    "connect": "Қосылу",
+    "disconnect": "Ажырату",
+    "follow": "Бақылау",
+    "unfollow": "Бақылаудан шығару",
+    "block": "Бұғаттау",
+    "unblock": "Бұғаттаудан шығару",
+    "report": "Шағымдану",
+    "markAsRead": "Оқылған деп белгілеу",
+    "markAllAsRead": "Барлығын оқылған деп белгілеу",
+    "clearAll": "Барлығын тазалау",
+    "showMore": "Көбірек көрсету",
+    "showLess": "Азырақ көрсету",
+    "readMore": "Толығырақ оқу",
+    "seeAll": "Барлығын көру",
+    "unfriendConfirm": "@{{username}} достықтан шығарылсын ба?",
+    "search": "ЖҚС іздеу..."
+  },
+  "createGroup": {
+    "title": "Жаңа топ құру",
+    "nameLabel": "Топ атауы *",
+    "namePlaceholder": "Мысалы: Технология әуесқойлары, Кітап клубы",
+    "descriptionLabel": "Сипаттама",
+    "descriptionPlaceholder": "Бұл топ не туралы?",
+    "categoryLabel": "Санат",
+    "categoryPlaceholder": "Санатты таңдаңыз...",
+    "visibilityLabel": "Көріну",
+    "visibilityPlaceholder": "Көрінуді таңдаңыз...",
+    "visibilityPublic": "Жалпыға ортақ - Кез келген адам көре алады және қосыла алады",
+    "visibilityPrivate": "Жеке - Мүшелер шақырылуы керек",
+    "createButton": "Топты құру",
+    "creatingButton": "Топ құрылуда..."
+  },
+  "createEvent": {
+    "title": "Жаңа оқиға құру",
+    "nameLabel": "Оқиға тақырыбы *",
+    "namePlaceholder": "Мысалы: Жыл сайынғы тех. конференция, Қауымдастық кездесуі",
+    "descriptionLabel": "Сипаттама",
+    "descriptionPlaceholder": "Оқиға туралы көбірек айтып беріңіз",
+    "categoryLabel": "Санат",
+    "categoryPlaceholder": "Санатты таңдаңыз...",
+    "locationLabel": "Орналасқан жері *",
+    "locationPlaceholder": "Мысалы: Конференция орталығы, Онлайн",
+    "startDateLabel": "Басталу күні мен уақыты *",
+    "startTimeLabel": "Басталу уақыты",
+    "endDateLabel": "Аяқталу күні мен уақыты (Міндетті емес)",
+    "endTimeLabel": "Аяқталу уақыты",
+    "visibilityLabel": "Көріну",
+    "visibilityPlaceholder": "Көрінуді таңдаңыз...",
+    "visibilityPublic": "Жалпыға ортақ - Кез келген адам көре алады",
+    "visibilityPrivate": "Жеке - Тек шақырумен",
+    "maxAttendeesLabel": "Макс. қатысушылар (Міндетті емес)",
+    "maxAttendeesPlaceholder": "Шексіз үшін бос қалдырыңыз",
+    "createButton": "Оқиғаны құру",
+    "creatingButton": "Оқиға құрылуда..."
+  }
+} 
