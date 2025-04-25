@@ -523,7 +523,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Use the provided redirectTo or construct one based on current origin
       const currentURL = window.location.origin;
-      const redirectURL = redirectTo || `${currentURL}/callback`;
+      const redirectURL = redirectTo || `${import.meta.env.VITE_APP_URL}/callback`;
+
       
       console.log(`[AuthProvider] signInWithGoogle: Using redirect URL: ${redirectURL}`);
 
