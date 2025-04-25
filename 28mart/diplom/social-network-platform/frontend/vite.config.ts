@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    base: '/',
+    base: 'https://diplomafinalx.onrender.com/',
     css: {
       postcss: {
         plugins: [
@@ -29,6 +29,13 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 3002,
       cors: true,
+      proxy: {
+        '/api': {
+          target: 'https://diplomafinalx.onrender.com',
+          changeOrigin: true,
+          secure: false
+        }
+      },
       hmr: {
         overlay: false,
       },
@@ -44,6 +51,8 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: true,
       minify: 'terser',
+      outDir: 'dist',
+      assetsDir: 'assets',
       terserOptions: {
         compress: {
           drop_console: false,
