@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from '../Navbar';
-import Sidebar from './Sidebar';
+import Sidebar, { SidebarBody } from '../ui/sidebar';  // Ensure SidebarBody is imported if needed
 import Footer from './Footer';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -15,7 +15,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} flex`}>
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-sm z-20">
-        <Sidebar />
+        <Sidebar>
+          <SidebarBody>
+            {/* Here you can place the actual content for Sidebar like Links or other components */}
+            {/* For example: */}
+            {/* <SidebarLink link={someLinkData} /> */}
+          </SidebarBody>
+        </Sidebar>
       </div>
 
       {/* Main Content */}
@@ -26,7 +32,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Page Content */}
-        <main className={`container mx-auto px-6 py-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <main className={`container mx-auto px-6 py-8 ${
+          isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+        }`}>
           {children}
         </main>
 
