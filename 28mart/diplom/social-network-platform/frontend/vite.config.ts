@@ -28,37 +28,30 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: 3002,
-      // CORS sorunlarını önlemek için
       cors: true,
-      // HMR sorunu için çözüm
       hmr: {
-        overlay: false, // Flash sorunu çözümü için HMR overlay'i devre dışı bırak
+        overlay: false,
       },
-      // Flash sorununu azaltmak için daha az güncellemelere neden olan yapılandırma
       watch: {
         usePolling: false,
-        interval: 1000, // dosyaları daha az sıklıkta kontrol et
+        interval: 1000,
       },
-      // Handle SPA routing
       fs: {
         strict: false,
       },
+      allowedHosts: ['diplomafinalx.onrender.com'], // Add this line to allow the host
     },
-    // Çok fazla konsol mesajı olmasını önleyelim
     build: {
       sourcemap: true,
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: false, // Hata ayıklama için console.log'ları tutuyoruz ama canlıda true yapılabilir
+          drop_console: false,
         },
       },
     },
-    // Olası döngü sorunlarını çözen debug ayarları
     optimizeDeps: {
-      // Bağımlılıkların önceden yüklenmesini iyileştir
       force: true,
-      // Optimization sorunlarıyla çakışan paketler
       exclude: ['react-router-dom'],
     },
   };
