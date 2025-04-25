@@ -517,43 +517,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Function to sign in with Google OAuth
-  const signInWithGoogle = useCallback(async (redirectTo?: string) => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       console.log('[AuthProvider] signInWithGoogle: Starting OAuth login flow');
-      
-      // Use the provided redirectTo or construct one based on current origin
-      const currentURL = window.location.origin;
-      const redirectURL = redirectTo || `${import.meta.env.VITE_APP_URL}/callback`;
-
-      
-      console.log(`[AuthProvider] signInWithGoogle: Using redirect URL: ${redirectURL}`);
-
-      // Store the redirect URL in localStorage so the callback page can verify it
-      localStorage.setItem('auth_redirect_url', redirectURL);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://diplomafinalx.onrender.com/auth/callback'
+          redirectTo: 'https://diplomafinalx.onrender.com/auth/callback',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         }
       });
-      
+
       if (error) {
         console.error('[AuthProvider] signInWithGoogle: Error', error);
         return { data: null, error };
       }
-      // LOGGING
-console.log("redirectURL:", redirectURL); // Buraya log ekle
 
-if (error) {
-  console.error('[AuthProvider] signInWithGoogle: Error', error);
-  return { data: null, error };
-}
-
-console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
-return { data, error: null };
-
-      console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
       return { data, error: null };
     } catch (error) {
       console.error('[AuthProvider] signInWithGoogle: Unexpected error', error);
