@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   emergencySignOut: () => void;
   signInWithGoogle: (redirectTo?: string) => Promise<{
-    data: any | null;
+    data: { provider?: string; url?: string } | null;
     error: Error | null;
   }>;
   refreshSession: () => Promise<{
@@ -519,29 +519,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to sign in with Google OAuth
   const signInWithGoogle = useCallback(async () => {
     try {
-      console.log('[AuthProvider] signInWithGoogle: Starting OAuth login flow');
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: 'https://diplomafinalx.onrender.com/auth/callback',
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
+            hd: 'stu.sdu.edu.kz'
           }
         }
       });
 
       if (error) {
         console.error('[AuthProvider] signInWithGoogle: Error', error);
-        return { data: null, error };
+        return { 
+          data: null, 
+          error: new Error(error.message)
+        };
       }
 
-      return { data, error: null };
+      localStorage.setItem('redirect_after_auth', 'https://diplomafinalx.onrender.com');
+      return { 
+        data: data as { provider: string; url: string } | null, 
+        error: null 
+      };
     } catch (error) {
-      console.error('[AuthProvider] signInWithGoogle: Unexpected error', error);
-      return {
-        data: null,
+      console.error('[AuthProvider] signInWithGoogle: Error', error);
+      return { 
+        data: null, 
         error: error instanceof Error ? error : new Error('Unknown error during Google sign-in')
       };
     }

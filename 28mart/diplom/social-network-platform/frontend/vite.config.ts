@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    base: 'https://diplomafinalx.onrender.com/',
+    base: '/',  // Changed from absolute URL to relative
     css: {
       postcss: {
         plugins: [
@@ -27,7 +27,6 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      port: 3002,
       cors: true,
       proxy: {
         '/api': {

@@ -17,16 +17,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.socialnetwork.backend.service.JwtService;
+import com.socialnetwork.backend.filter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CorsConfig corsConfig;
-    private final JwtConfig jwtConfig;
     private final JwtService jwtService;
+    private UserDetailsService userDetailsService; // Remove final to allow setter injection
+
+    @Autowired
+    public SecurityConfig(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
@@ -36,13 +42,15 @@ public class SecurityConfig {
             .roles("USER")
             .build();
 
-        return new InMemoryUserDetailsManager(user);
+        this.userDetailsService = new InMemoryUserDetailsManager(user);
+        return this.userDetailsService;
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsService userDetailsService) {
-        System.out.println("JWT secret length: " + jwtConfig.getSecret().length());
-        System.out.println("JWT expiration: " + jwtConfig.getExpiration() + " ms");
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        if (userDetailsService == null) {
+            userDetailsService = userDetailsService(passwordEncoder());
+        }
         return new JwtAuthenticationFilter(jwtService, userDetailsService);
     }
 
@@ -51,13 +59,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    @Bean 
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(java.util.Arrays.asList(corsConfig.getAllowedOrigins()));
-        configuration.setAllowedMethods(java.util.Arrays.asList(corsConfig.getAllowedMethods()));
-        configuration.setAllowedHeaders(java.util.Arrays.asList(corsConfig.getAllowedHeaders()));
-        configuration.setAllowCredentials(corsConfig.isAllowCredentials());
+        configuration.addAllowedOrigin("*"); // Or specific origins
+        configuration.addAllowedMethod("*"); // Or specific methods
+        configuration.addAllowedHeader("*"); // Or specific headers
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -65,11 +73,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, 
+                                         JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         return http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> {
                 auth.requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
