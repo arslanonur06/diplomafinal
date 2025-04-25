@@ -546,7 +546,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('[AuthProvider] signInWithGoogle: Error', error);
         return { data: null, error };
       }
-      
+      // LOGGING
+console.log("redirectURL:", redirectURL); // Buraya log ekle
+
+if (error) {
+  console.error('[AuthProvider] signInWithGoogle: Error', error);
+  return { data: null, error };
+}
+
+console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
+return { data, error: null };
+
       console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
       return { data, error: null };
     } catch (error) {
