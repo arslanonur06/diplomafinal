@@ -3,6 +3,7 @@ import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Sidebar, { SidebarBody, SidebarLink } from '../ui/sidebar';
 import { useTranslation } from 'react-i18next';
+
 import { 
   FaHome, 
   FaUsers, 
@@ -129,4 +130,4 @@ const MainLayout = () => {
 };
 
 // Add scroll-to-top effect on route changes
-export default MainLayout; 
+export default MainLayout;
