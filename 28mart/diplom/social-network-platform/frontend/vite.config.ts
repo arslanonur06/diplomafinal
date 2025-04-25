@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
       fs: {
         strict: false,
       },
-      allowedHosts: ['connectme.onrender.com'], // Add this line to allow the host
+      allowedHosts: ['diplomafinalx.onrender.com'], // Add this line to allow the host
     },
     build: {
       sourcemap: true,
