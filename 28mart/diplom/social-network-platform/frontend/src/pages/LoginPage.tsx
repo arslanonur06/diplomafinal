@@ -208,6 +208,7 @@ const LoginPage: React.FC = () => {
         options: {
           redirectTo: redirectUrl,
           queryParams: {
+            access_type: 'offline',
             prompt: 'select_account'
           }
         }
