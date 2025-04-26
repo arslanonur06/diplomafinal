@@ -27,41 +27,19 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      port: Number(process.env.PORT) || 4173, // Port ayarı eklendi
-      cors: true,
+      port: Number(process.env.PORT) || 4173,
       proxy: {
         '/api': {
           target: 'https://diplomafinalx.onrender.com',
           changeOrigin: true,
           secure: false
         }
-      },
-      hmr: {
-        overlay: false,
-      },
-      watch: {
-        usePolling: false,
-        interval: 1000,
-      },
-      fs: {
-        strict: false,
-      },
-      allowedHosts: ['diplomafinalx.onrender.com'],
+      }
     },
     build: {
       sourcemap: true,
-      minify: 'terser',
       outDir: 'dist',
-      assetsDir: 'assets',
-      terserOptions: {
-        compress: {
-          drop_console: false,
-        },
-      },
-    },
-    optimizeDeps: {
-      force: true,
-      exclude: ['react-router-dom'],
-    },
+      assetsDir: 'assets'
+    }
   };
 });
