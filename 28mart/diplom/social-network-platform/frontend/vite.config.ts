@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    base: '/',  // Changed from absolute URL to relative
+    base: '/',
     css: {
       postcss: {
         plugins: [
@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
+      port: Number(process.env.PORT) || 4173, // Port ayarı eklendi
       cors: true,
       proxy: {
         '/api': {
@@ -45,7 +46,7 @@ export default defineConfig(({ mode }) => {
       fs: {
         strict: false,
       },
-      allowedHosts: ['diplomafinalx.onrender.com'], // Add this line to allow the host
+      allowedHosts: ['diplomafinalx.onrender.com'],
     },
     build: {
       sourcemap: true,
