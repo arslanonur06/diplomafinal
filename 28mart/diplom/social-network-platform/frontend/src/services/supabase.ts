@@ -2,7 +2,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const appUrl = 'https://diplomafinalx.onrender.com';
+const appUrl = 'https://connectme-uqip.onrender.com';
 
 // Create a single supabase instance
 const supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
@@ -549,9 +549,9 @@ export const getProfileWithConnections = async (userId: string, currentUserId: s
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session) {
     // Set secure cookie attributes
-    document.cookie = 'sb-auth-token=true; SameSite=Strict; Secure; path=/; domain=diplomafinalx.onrender.com';
+    document.cookie = 'sb-auth-token=true; SameSite=Strict; Secure; path=/; domain=https://connectme-uqip.onrender.com';
   } else if (event === 'SIGNED_OUT') {
     // Clear auth cookie
-    document.cookie = 'sb-auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=diplomafinalx.onrender.com';
+    document.cookie = 'sb-auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=https://connectme-uqip.onrender.com';
   }
 });

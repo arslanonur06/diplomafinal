@@ -11,8 +11,8 @@ const port = 3005;
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://diplomafinalx.onrender.com',
-    'http://localhost:3002',
+    'https://connectme-uqip.onrender.com',
+    
     'http://localhost:3004'
   ],
   credentials: true

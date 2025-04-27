@@ -22,7 +22,7 @@ export default defineConfig({
     port: Number(process.env.PORT) || 4173,
     proxy: {
       '/api': {
-        target: 'https://diplomafinalx.onrender.com',
+        target: 'https://connectme-uqip.onrender.com',
         changeOrigin: true,
         secure: false
       }

@@ -522,7 +522,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://diplomafinalx.onrender.com/auth/callback',
+          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -539,7 +539,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
 
-      localStorage.setItem('redirect_after_auth', 'https://diplomafinalx.onrender.com');
+      localStorage.setItem('redirect_after_auth', 'https://connectme-uqip.onrender.com');
       return { 
         data: data as { provider: string; url: string } | null, 
         error: null 
