@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../services/supabase'; // Use the main client now
+import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { createClient } from '@supabase/supabase-js'; // Keep createClient for local instance if needed
+import { createClient } from '@supabase/supabase-js';
 
-// Re-add environment variables for clarity, ensure they match .env.local
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Fallback just in case
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw'; // Fallback just in case
+// Environment variables (no hardcoded fallbacks, rely on render env vars)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Re-introduce the local Supabase client specifically for the manual setSession if needed
+// Local Supabase client for manual setSession if needed
 const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
     autoRefreshToken: true,
@@ -55,12 +55,12 @@ const AuthCallbackPage: React.FC = () => {
         setError(null); // Clear previous errors
         
         console.log('=========================');
-        console.log('AuthCallbackPage: Processing OAuth callback (Reverted Version)');
+        console.log('AuthCallbackPage: Processing OAuth callback');
         console.log('CURRENT URL:', window.location.href);
         console.log('URL Hash:', window.location.hash);
         console.log('Environment check:');
-        console.log('- VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET (Using Fallback)');
-        console.log('- VITE_SUPABASE_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET (Using Fallback)');
+        console.log('- VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET');
+        console.log('- VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET');
         console.log('=========================');
 
         // Collect debug info
@@ -102,12 +102,24 @@ const AuthCallbackPage: React.FC = () => {
           debugData.authMethodAttempted = 'exchangeCodeForSession';
           setDebugInfo({...debugData});
           console.log('AuthCallback: Attempt 2 - Trying exchangeCodeForSession...');
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          const query = new URLSearchParams(window.location.search);
+          const code = query.get('code');
           
-          if (exchangeError) {
-            console.error('AuthCallback: Error with exchangeCodeForSession:', exchangeError);
-          } else {
-            const { data: refreshData } = await supabase.auth.getSession(); // Check session *after* exchange
+          if (code) {
+            console.log('AuthCallback: Using code:', code);
+            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (exchangeError) {
+              console.error('AuthCallback: Detailed exchangeCodeForSession error:', {
+                message: exchangeError.message,
+                name: exchangeError.name,
+                status: exchangeError.status,
+                stack: exchangeError.stack
+              });
+              throw exchangeError;
+            }
+            
+            const { data: refreshData } = await supabase.auth.getSession();
             if (refreshData?.session) {
               console.log('AuthCallback: SUCCESS (Approach 2)! Session obtained via code exchange:', refreshData.session.user.id);
               localStorage.setItem('auth_method', 'code_exchange');
@@ -116,10 +128,14 @@ const AuthCallbackPage: React.FC = () => {
               return;
             } else {
               console.error('AuthCallback: exchangeCodeForSession succeeded but no session found afterwards.');
+              throw new Error('No session found after code exchange');
             }
+          } else {
+            console.error('AuthCallback: No code in query params');
+            throw new Error('No authentication code provided');
           }
         } catch (exchangeErr) {
-          console.error('AuthCallback: exchangeCodeForSession error:', exchangeErr);
+          console.error('AuthCallback: exchangeCodeForSession catch error:', exchangeErr);
         }
         
         // APPROACH 3: Manually process hash (using callbackSupabase client for setSession)
@@ -138,40 +154,37 @@ const AuthCallbackPage: React.FC = () => {
               };
               console.log('AuthCallback: Calling setSession with tokens...');
               
-              // Use the local callbackSupabase instance here for setSession
               const { data: sessionData, error: sessionError } = await callbackSupabase.auth.setSession(sessionOptions);
               
               if (sessionError) {
                 console.error('AuthCallback: Error setting session manually:', sessionError);
-                throw sessionError; // Throw to be caught by outer catch block
+                throw sessionError;
               }
               
               if (sessionData?.session) {
                 console.log('AuthCallback: SUCCESS (Approach 3)! Session set manually:', sessionData.session.user.id);
                 localStorage.setItem('auth_method', 'manual_hash');
                 
-                // IMPORTANT: Also update the main supabase client's session
                 await supabase.auth.setSession(sessionOptions);
                 
                 toast.success('Successfully signed in!');
                 navigate('/home', { replace: true });
                 return;
               } else {
-                 console.error('AuthCallback: Manual setSession call did not return a session.');
+                console.error('AuthCallback: Manual setSession call did not return a session.');
               }
             } else if (hashParams?.error) {
-               console.error('AuthCallback: Error found in hash fragment:', hashParams.error, hashParams.error_description);
-               throw new Error(`OAuth Provider Error: ${hashParams.error_description || hashParams.error}`);
+              console.error('AuthCallback: Error found in hash fragment:', hashParams.error, hashParams.error_description);
+              throw new Error(`OAuth Provider Error: ${hashParams.error_description || hashParams.error}`);
             } else {
-               console.error('AuthCallback: No access_token or error found in hash.');
+              console.error('AuthCallback: No access_token or error found in hash.');
             }
           } catch (manualErr) {
             console.error('AuthCallback: Manual hash processing error:', manualErr);
-            // If this specific error happened, throw it so it's shown to user
             if (manualErr instanceof Error) throw manualErr;
           }
         } else {
-           console.log('AuthCallback: No hash fragment present in URL.');
+          console.log('AuthCallback: No hash fragment present in URL.');
         }
         
         // If all approaches failed
@@ -183,7 +196,6 @@ const AuthCallbackPage: React.FC = () => {
         if (isMounted) {
           setError(err.message || 'An unknown error occurred during authentication.');
           setLoading(false);
-          // Update debug info with error
           setDebugInfo((prev: any) => ({ ...prev, error: err.message, finalStatus: 'Failed' }));
         }
       }
@@ -191,14 +203,11 @@ const AuthCallbackPage: React.FC = () => {
 
     handleCallback();
 
-    // Cleanup function
     return () => {
       isMounted = false;
-      // No timeout to clear in this version
     };
-  }, [navigate]); // navigate dependency
+  }, [navigate]);
 
-  // UI Remains similar to previous versions, showing loading or error state
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 p-4">
       <div className="text-center max-w-lg w-full">
@@ -224,7 +233,6 @@ const AuthCallbackPage: React.FC = () => {
             </button>
           </>
         )}
-        {/* Optional Debug Output */}
         {debugInfo && (
           <details className="mt-6 text-left">
             <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400">Show Debug Info</summary>
@@ -238,4 +246,4 @@ const AuthCallbackPage: React.FC = () => {
   );
 };
 
-export default AuthCallbackPage; 
+export default AuthCallbackPage;
