@@ -33,5 +33,12 @@ export default defineConfig({
     sourcemap: false,
     minify: true,
     target: 'es2015'
-  }
+  },
+  define: {
+    'process.env': {
+      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY,
+      VITE_GOOGLE_REDIRECT_URL: process.env.VITE_GOOGLE_REDIRECT_URL,
+    },
+  },
 });

@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../services/supabase'; // Use the main client now
+import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { createClient } from '@supabase/supabase-js'; // Keep createClient for local instance if needed
+import { createClient } from '@supabase/supabase-js';
 
-// Re-add environment variables for clarity, ensure they match .env.local
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Replace with your project URL
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI'; // Replace with your anon key
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co';
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI';
 
 console.log('Using Supabase URL:', SUPABASE_URL);
 console.log('Using Supabase Key:', SUPABASE_KEY);
 
-// Re-introduce the local Supabase client specifically for the manual setSession if needed
 const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false, // Manual processing
+    detectSessionInUrl: false,
   },
 });
 
@@ -37,17 +35,6 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
-        // Extract the code from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-
-        if (!code) {
-          throw new Error('No authorization code found in the callback URL.');
-        }
-
-        console.log('AuthCallbackPage: Found authorization code:', code);
-
-        // Exchange the code for a session
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (exchangeError) {
@@ -55,7 +42,6 @@ const AuthCallbackPage: React.FC = () => {
           throw new Error(exchangeError.message || 'Failed to exchange code for session.');
         }
 
-        // Check if the session was successfully established
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError || !sessionData?.session) {
@@ -100,7 +86,7 @@ const AuthCallbackPage: React.FC = () => {
             </svg>
             <h1 className="text-xl font-semibold text-red-600 dark:text-red-400 mt-4 mb-2">Authentication Failed</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4 whitespace-pre-wrap">{error}</p>
-            <button 
+            <button
               onClick={() => navigate('/login', { replace: true })}
               className="mt-6 px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors"
             >

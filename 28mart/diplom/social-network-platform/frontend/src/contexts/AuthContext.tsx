@@ -526,7 +526,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-            hd: 'stu.sdu.edu.kz', // Optional: restrict to specific Google Workspace domain
           },
         },
       });
@@ -539,7 +538,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
 
-      localStorage.setItem('redirect_after_auth', 'https://connectme-uqip.onrender.com');
+      console.log('[AuthProvider] signInWithGoogle: Redirecting to Google OAuth...');
       return { 
         data: data as { provider: string; url: string } | null, 
         error: null,
