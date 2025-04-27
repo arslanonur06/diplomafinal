@@ -38,15 +38,7 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-
-        if (!code) {
-          throw new Error('No authorization code found in the callback URL.');
-        }
-
-        console.log('AuthCallbackPage: Found authorization code:', code);
-
+        // Ensure the full URL is passed to exchangeCodeForSession
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (exchangeError) {
