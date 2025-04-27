@@ -522,33 +522,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback',
+          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback', // Ensure this matches your Supabase settings
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-            hd: 'stu.sdu.edu.kz'
-          }
-        }
+            hd: 'stu.sdu.edu.kz', // Optional: restrict to specific Google Workspace domain
+          },
+        },
       });
 
       if (error) {
         console.error('[AuthProvider] signInWithGoogle: Error', error);
         return { 
           data: null, 
-          error: new Error(error.message)
+          error: new Error(error.message),
         };
       }
 
       localStorage.setItem('redirect_after_auth', 'https://connectme-uqip.onrender.com');
       return { 
         data: data as { provider: string; url: string } | null, 
-        error: null 
+        error: null,
       };
     } catch (error) {
       console.error('[AuthProvider] signInWithGoogle: Error', error);
       return { 
         data: null, 
-        error: error instanceof Error ? error : new Error('Unknown error during Google sign-in')
+        error: error instanceof Error ? error : new Error('Unknown error during Google sign-in'),
       };
     }
   }, []);

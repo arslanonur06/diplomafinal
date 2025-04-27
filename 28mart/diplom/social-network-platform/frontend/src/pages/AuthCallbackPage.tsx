@@ -5,8 +5,11 @@ import toast from 'react-hot-toast';
 import { createClient } from '@supabase/supabase-js'; // Keep createClient for local instance if needed
 
 // Re-add environment variables for clarity, ensure they match .env.local
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Fallback just in case
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw'; // Fallback just in case
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Replace with your project URL
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI'; // Replace with your anon key
+
+console.log('Using Supabase URL:', SUPABASE_URL);
+console.log('Using Supabase Key:', SUPABASE_KEY);
 
 // Re-introduce the local Supabase client specifically for the manual setSession if needed
 const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -36,15 +39,6 @@ const AuthCallbackPage: React.FC = () => {
         console.log('CURRENT URL:', window.location.href);
 
         // Attempt to exchange the code for a session
-        const query = new URLSearchParams(window.location.search);
-        const code = query.get('code');
-
-        if (!code) {
-          throw new Error('No authorization code found in the callback URL.');
-        }
-
-        console.log('AuthCallbackPage: Found authorization code:', code);
-
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (exchangeError) {
