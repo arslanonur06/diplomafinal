@@ -31,13 +31,12 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
-        // Log the hash fragment for debugging
-        console.log('AuthCallbackPage: Hash Fragment:', window.location.hash);
-
-        // Log query parameters for debugging
+        // Check both query parameters and hash fragment
         const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
+        const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the leading '#'
+
+        const code = urlParams.get('code') || hashParams.get('code');
+        const state = urlParams.get('state') || hashParams.get('state');
 
         console.log('AuthCallbackPage: Query Parameters:', {
           code,
