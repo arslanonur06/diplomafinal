@@ -3,7 +3,22 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": {
+  
+  
+  
+  
+  
+  
+  
+    "name": "frontend",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",       
+      "preview": "vite preview"
+    },
+    "scripts": {
     "dev": "concurrently \"vite --port 3004 --force\" \"node start-translation-server.js\"",
     "dev:vite": "vite --port 3004 --force",
     "translation-server": "node start-translation-server.js",
