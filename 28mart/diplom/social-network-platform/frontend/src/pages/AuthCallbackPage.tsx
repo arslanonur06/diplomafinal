@@ -23,7 +23,6 @@ const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 const AuthCallbackPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<any>(null); // Use any for complex debug object
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +37,17 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
-        // Ensure the full URL is passed to exchangeCodeForSession
+        // Extract the code from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (!code) {
+          throw new Error('No authorization code found in the callback URL.');
+        }
+
+        console.log('AuthCallbackPage: Found authorization code:', code);
+
+        // Exchange the code for a session
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (exchangeError) {
@@ -74,7 +83,6 @@ const AuthCallbackPage: React.FC = () => {
     };
   }, [navigate]);
 
-  // UI Remains similar to previous versions, showing loading or error state
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 p-4">
       <div className="text-center max-w-lg w-full">
@@ -99,15 +107,6 @@ const AuthCallbackPage: React.FC = () => {
               Return to Login
             </button>
           </>
-        )}
-        {/* Optional Debug Output */}
-        {debugInfo && (
-          <details className="mt-6 text-left">
-            <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400">Show Debug Info</summary>
-            <pre className="mt-2 text-xs bg-gray-200 dark:bg-gray-800 p-3 rounded overflow-auto">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
-          </details>
         )}
       </div>
     </div>
