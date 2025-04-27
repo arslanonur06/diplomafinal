@@ -35,6 +35,22 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
+        // Log query parameters for debugging
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+
+        console.log('AuthCallbackPage: Query Parameters:', {
+          code,
+          state,
+        });
+
+        if (!code) {
+          throw new Error('No authorization code found in the callback URL.');
+        }
+
+        // Attempt to exchange the code for a session
+        console.log('AuthCallbackPage: Attempting to exchange code for session...');
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (exchangeError) {
@@ -42,6 +58,8 @@ const AuthCallbackPage: React.FC = () => {
           throw new Error(exchangeError.message || 'Failed to exchange code for session.');
         }
 
+        // Check if the session was successfully established
+        console.log('AuthCallbackPage: Checking session...');
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError || !sessionData?.session) {

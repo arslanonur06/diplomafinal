@@ -519,6 +519,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to sign in with Google OAuth
   const signInWithGoogle = useCallback(async () => {
     try {
+      console.log('[AuthProvider] signInWithGoogle: Initiating Google OAuth...');
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -538,7 +539,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
 
-      console.log('[AuthProvider] signInWithGoogle: Redirecting to Google OAuth...');
+      console.log('[AuthProvider] signInWithGoogle: Redirect URL:', data?.url);
       return { 
         data: data as { provider: string; url: string } | null, 
         error: null,
