@@ -17,188 +17,68 @@ const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   },
 });
 
-
-
 const AuthCallbackPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null); // Use any for complex debug object
   const navigate = useNavigate();
 
-  // Helper function to parse hash fragment
-  const parseHashFragment = (hash: string): Record<string, string> | null => {
-    if (!hash || hash.length < 2) return null;
-    
-    const fragment = hash.substring(1); // remove leading '#'
-    const pairs = fragment.split('&');
-    const result: Record<string, string> = {};
-    
-    pairs.forEach(pair => {
-      try {
-        const [key, value] = pair.split('=');
-        if (key && value) {
-          result[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, ' '));
-        }
-      } catch (e) {
-        console.warn('AuthCallback: Failed to parse key-value pair in hash:', pair, e);
-      }
-    });
-    
-    return result;
-  };
-
   useEffect(() => {
     let isMounted = true;
-    
+
     const handleCallback = async () => {
       try {
         if (!isMounted) return;
         setLoading(true);
-        setError(null); // Clear previous errors
-        
-        console.log('=========================');
-        console.log('AuthCallbackPage: Processing OAuth callback (Reverted Version)');
+        setError(null);
+
+        console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
-        console.log('URL Hash:', window.location.hash);
-        console.log('Environment check:');
-        console.log('- VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET (Using Fallback)');
-        console.log('- VITE_SUPABASE_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET (Using Fallback)');
-        console.log('=========================');
 
-        // Collect debug info
-        const debugData = {
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          hash: window.location.hash,
-          supabaseUrlUsed: SUPABASE_URL,
-          supabaseKeySet: !!SUPABASE_KEY,
-          userAgent: navigator.userAgent,
-          authMethodAttempted: 'None'
-        };
-        setDebugInfo(debugData);
+        // Attempt to exchange the code for a session
+        const query = new URLSearchParams(window.location.search);
+        const code = query.get('code');
 
-        // APPROACH 1: Check existing session (using main supabase client)
-        try {
-          debugData.authMethodAttempted = 'getSession';
-          setDebugInfo({...debugData});
-          console.log('AuthCallback: Attempt 1 - Checking existing session...');
-          const { data, error: getSessionError } = await supabase.auth.getSession();
-          
-          if (getSessionError) {
-            console.error('AuthCallback: Error getting session:', getSessionError);
-          } else if (data?.session) {
-            console.log('AuthCallback: SUCCESS (Approach 1)! Valid session detected:', data.session.user.id);
-            localStorage.setItem('auth_method', 'existing_session');
-            toast.success('Already signed in!');
-            navigate('/home', { replace: true });
-            return;
-          } else {
-            console.log('AuthCallback: No existing session found.');
-          }
-        } catch (sessionErr) {
-          console.error('AuthCallback: getSession check error:', sessionErr);
+        if (!code) {
+          throw new Error('No authorization code found in the callback URL.');
         }
-          
-        // APPROACH 2: Try standard code exchange (using main supabase client)
-        try {
-          debugData.authMethodAttempted = 'exchangeCodeForSession';
-          setDebugInfo({...debugData});
-          console.log('AuthCallback: Attempt 2 - Trying exchangeCodeForSession...');
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
-          
-          if (exchangeError) {
-            console.error('AuthCallback: Error with exchangeCodeForSession:', exchangeError);
-          } else {
-            const { data: refreshData } = await supabase.auth.getSession(); // Check session *after* exchange
-            if (refreshData?.session) {
-              console.log('AuthCallback: SUCCESS (Approach 2)! Session obtained via code exchange:', refreshData.session.user.id);
-              localStorage.setItem('auth_method', 'code_exchange');
-              toast.success('Successfully signed in!');
-              navigate('/home', { replace: true });
-              return;
-            } else {
-              console.error('AuthCallback: exchangeCodeForSession succeeded but no session found afterwards.');
-            }
-          }
-        } catch (exchangeErr) {
-          console.error('AuthCallback: exchangeCodeForSession error:', exchangeErr);
-        }
-        
-        // APPROACH 3: Manually process hash (using callbackSupabase client for setSession)
-        if (window.location.hash) {
-          try {
-            debugData.authMethodAttempted = 'manualHashParsing';
-            setDebugInfo({...debugData});
-            console.log('AuthCallback: Attempt 3 - Processing hash fragment...');
-            const hashParams = parseHashFragment(window.location.hash);
-            
-            if (hashParams && hashParams.access_token) {
-              console.log('AuthCallback: Found access_token in hash. Params:', Object.keys(hashParams).join(', '));
-              const sessionOptions = {
-                access_token: hashParams.access_token,
-                refresh_token: hashParams.refresh_token || ''
-              };
-              console.log('AuthCallback: Calling setSession with tokens...');
-              
-              // Use the local callbackSupabase instance here for setSession
-              const { data: sessionData, error: sessionError } = await callbackSupabase.auth.setSession(sessionOptions);
-              
-              if (sessionError) {
-                console.error('AuthCallback: Error setting session manually:', sessionError);
-                throw sessionError; // Throw to be caught by outer catch block
-              }
-              
-              if (sessionData?.session) {
-                console.log('AuthCallback: SUCCESS (Approach 3)! Session set manually:', sessionData.session.user.id);
-                localStorage.setItem('auth_method', 'manual_hash');
-                
-                // IMPORTANT: Also update the main supabase client's session
-                await supabase.auth.setSession(sessionOptions);
-                
-                toast.success('Successfully signed in!');
-                navigate('/home', { replace: true });
-                return;
-              } else {
-                 console.error('AuthCallback: Manual setSession call did not return a session.');
-              }
-            } else if (hashParams?.error) {
-               console.error('AuthCallback: Error found in hash fragment:', hashParams.error, hashParams.error_description);
-               throw new Error(`OAuth Provider Error: ${hashParams.error_description || hashParams.error}`);
-            } else {
-               console.error('AuthCallback: No access_token or error found in hash.');
-            }
-          } catch (manualErr) {
-            console.error('AuthCallback: Manual hash processing error:', manualErr);
-            // If this specific error happened, throw it so it's shown to user
-            if (manualErr instanceof Error) throw manualErr;
-          }
-        } else {
-           console.log('AuthCallback: No hash fragment present in URL.');
-        }
-        
-        // If all approaches failed
-        console.error('AuthCallback: All authentication approaches failed.');
-        throw new Error('Unable to establish session. Please try logging in again.');
 
+        console.log('AuthCallbackPage: Found authorization code:', code);
+
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+
+        if (exchangeError) {
+          console.error('AuthCallbackPage: Error during exchangeCodeForSession:', exchangeError);
+          throw new Error(exchangeError.message || 'Failed to exchange code for session.');
+        }
+
+        // Check if the session was successfully established
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError || !sessionData?.session) {
+          console.error('AuthCallbackPage: No session found after code exchange:', sessionError);
+          throw new Error('Unable to establish session. Please try logging in again.');
+        }
+
+        console.log('AuthCallbackPage: Session established successfully:', sessionData.session.user.id);
+        toast.success('Successfully signed in!');
+        navigate('/home', { replace: true });
       } catch (err: any) {
-        console.error('AuthCallbackPage: Fatal error during callback handling:', err);
+        console.error('AuthCallbackPage: Error during callback handling:', err);
+        setError(err.message || 'An unknown error occurred during authentication.');
+      } finally {
         if (isMounted) {
-          setError(err.message || 'An unknown error occurred during authentication.');
           setLoading(false);
-          // Update debug info with error
-          setDebugInfo((prev: any) => ({ ...prev, error: err.message, finalStatus: 'Failed' }));
         }
       }
     };
 
     handleCallback();
 
-    // Cleanup function
     return () => {
       isMounted = false;
-      // No timeout to clear in this version
     };
-  }, [navigate]); // navigate dependency
+  }, [navigate]);
 
   // UI Remains similar to previous versions, showing loading or error state
   return (
