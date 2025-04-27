@@ -14,12 +14,14 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Allow all origins
-        config.addAllowedOrigin("*");
-        // Allow all headers
+        // Allow specific origins
+        config.addAllowedOrigin("https://connectme-uqip.onrender.com"); // Render static site
+        config.addAllowedOrigin("http://localhost:3004"); // Local development
+
+        // Allow all headers and methods
         config.addAllowedHeader("*");
-        // Allow all methods
         config.addAllowedMethod("*");
+        config.setAllowCredentials(true); // Allow cookies and credentials
         
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

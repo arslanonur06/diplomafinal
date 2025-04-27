@@ -22,11 +22,16 @@ export default defineConfig({
     port: Number(process.env.PORT) || 4173,
     proxy: {
       '/api': {
-        target: 'https://connectme-uqip.onrender.com',
+        target: 'https://your-backend-api-url.onrender.com', // Replace with your backend API URL
         changeOrigin: true,
-        secure: false
-      }
-    }
+        secure: true,
+      },
+      '/translation': {
+        target: 'http://localhost:3005', // Translation server for local development
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     outDir: 'dist',
