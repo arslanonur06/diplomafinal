@@ -1,12 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
+import path from 'path';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const port = 3005;
+const port = process.env.TRANSLATION_SERVER_PORT || 3005;
 
 // CORS configuration
 app.use(cors({
@@ -18,7 +20,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use(bodyParser.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -47,6 +49,10 @@ app.post('/google-translate', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Import the translation proxy routes
+import translationProxy from './server/dist/translationProxy';
+app.use('/api/translation', translationProxy);
 
 app.listen(port, () => {
   console.log(`Translation server running on http://localhost:${port}`);
