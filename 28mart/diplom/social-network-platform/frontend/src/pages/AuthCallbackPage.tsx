@@ -31,7 +31,10 @@ const AuthCallbackPage: React.FC = () => {
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
-        // Check both query parameters and hash fragment
+        // Log the hash fragment for debugging
+        console.log('AuthCallbackPage: Hash Fragment:', window.location.hash);
+
+        // Log query parameters for debugging
         const urlParams = new URLSearchParams(window.location.search);
         const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the leading '#'
 
