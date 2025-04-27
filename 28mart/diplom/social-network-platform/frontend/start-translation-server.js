@@ -13,11 +13,12 @@ const port = process.env.TRANSLATION_SERVER_PORT || 3005;
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://connectme-uqip.onrender.com',
-    
-    'http://localhost:3004'
+    'https://connectme-uqip.onrender.com', // Production frontend
+    'http://localhost:3004', // Local frontend
   ],
-  credentials: true
+  methods: ['GET', 'POST', 'OPTIONS'], // Allow specific HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
+  credentials: true, // Allow cookies and credentials
 }));
 
 app.use(bodyParser.json());
