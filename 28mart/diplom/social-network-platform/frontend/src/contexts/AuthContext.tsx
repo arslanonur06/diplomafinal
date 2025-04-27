@@ -523,7 +523,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback', // Ensure this matches your Supabase settings
+          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

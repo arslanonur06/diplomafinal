@@ -21,6 +21,9 @@ app.use(cors({
   credentials: true, // Allow cookies and credentials
 }));
 
+// Ensure preflight requests are handled
+app.options('*', cors());
+
 app.use(bodyParser.json());
 
 // Health check endpoint

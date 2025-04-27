@@ -28,10 +28,6 @@ const AuthCallbackPage: React.FC = () => {
 
     const handleCallback = async () => {
       try {
-        if (!isMounted) return;
-        setLoading(true);
-        setError(null);
-
         console.log('AuthCallbackPage: Processing OAuth callback...');
         console.log('CURRENT URL:', window.location.href);
 
