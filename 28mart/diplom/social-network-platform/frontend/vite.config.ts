@@ -54,68 +54,20 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
         '@components': path.resolve(__dirname, './src/components'),
         '@contexts': path.resolve(__dirname, './src/contexts')
-      },
-      // Add preserve symlinks option to handle case sensitivity
-      preserveSymlinks: true
+      }
     },
     server: {
-      host: true,
       port: 3004,
-      // CORS sorunlarını önlemek için
-      cors: true,
-      // HMR sorunu için çözüm
-      hmr: {
-        overlay: false, // Flash sorunu çözümü için HMR overlay'i devre dışı bırak
-      },
-      // Flash sorununu azaltmak için daha az güncellemelere neden olan yapılandırma
-      watch: {
-        usePolling: false,
-        interval: 1000, // dosyaları daha az sıklıkta kontrol et
-      },
-      // Handle SPA routing
       fs: {
-        strict: false,
         // Allow serving files from one level up to the project root
         allow: ['..']
-      },
+      }
     },
-    // Çok fazla konsol mesajı olmasını önleyelim
     build: {
       sourcemap: true,
-      minify: true,
-      terserOptions: {
-        compress: {
-          drop_console: false, // Hata ayıklama için console.log'ları tutuyoruz ama canlıda true yapılabilir
-        },
-      },
       commonjsOptions: {
         transformMixedEsModules: true,
-      },
-      // Rollup specific options
-      rollupOptions: {
-        // Preserve file paths and case
-        preserveEntrySignatures: 'strict',
       }
-    },
-    // Olası döngü sorunlarını çözen debug ayarları
-    optimizeDeps: {
-      // Bağımlılıkların önceden yüklenmesini iyileştir
-      force: true,
-      // Optimization sorunlarıyla çakışan paketler
-      exclude: ['react-router-dom'],
-      include: [
-        '@testing-library/react',
-        '@testing-library/jest-dom'
-      ],
-      esbuildOptions: {
-        // Don't require type declarations for JS files
-        allowOverwrite: true,
-        resolveExtensions: ['.js', '.jsx', '.ts', '.tsx']
-      }
-    },
-    // Add environment variables for testing
-    define: {
-      'process.env': process.env
     }
   };
 });
