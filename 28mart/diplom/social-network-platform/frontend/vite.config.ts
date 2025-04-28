@@ -23,11 +23,13 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
+        '@components': resolve(__dirname, './src/components'),
+        '@contexts': resolve(__dirname, './src/contexts')
       },
     },
     server: {
       host: true,
-      port: 3002,
+      port: 3004,
       // CORS sorunlarını önlemek için
       cors: true,
       // HMR sorunu için çözüm
@@ -47,12 +49,15 @@ export default defineConfig(({ mode }) => {
     // Çok fazla konsol mesajı olmasını önleyelim
     build: {
       sourcemap: true,
-      minify: 'terser',
+      minify: true,
       terserOptions: {
         compress: {
           drop_console: false, // Hata ayıklama için console.log'ları tutuyoruz ama canlıda true yapılabilir
         },
       },
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      }
     },
     // Olası döngü sorunlarını çözen debug ayarları
     optimizeDeps: {
@@ -60,6 +65,14 @@ export default defineConfig(({ mode }) => {
       force: true,
       // Optimization sorunlarıyla çakışan paketler
       exclude: ['react-router-dom'],
+      include: [
+        '@testing-library/react',
+        '@testing-library/jest-dom'
+      ]
     },
+    // Add environment variables for testing
+    define: {
+      'process.env': process.env
+    }
   };
 });

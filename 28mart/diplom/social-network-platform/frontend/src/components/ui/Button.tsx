@@ -14,6 +14,7 @@ const buttonVariants = cva(
         outline: "border border-input bg-background hover:bg-gradient-to-r hover:from-slate-500 hover:to-rose-400 hover:text-white",
         secondary: "bg-gradient-to-r from-slate-400 to-rose-300 hover:from-slate-500 hover:to-rose-400 text-white",
         destructive: "bg-red-500 text-white hover:bg-red-600",
+        primary: "bg-blue-600 text-white hover:bg-blue-700",
       },
       size: {
         default: "h-10 px-4 py-2",
