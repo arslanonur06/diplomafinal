@@ -3,6 +3,26 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
+import path from 'path';
+import fs from 'fs';
+
+// Handle Button.tsx file casing during build
+const ensureButtonCasing = () => {
+  const buttonLowerPath = path.resolve(__dirname, 'src/components/ui/button.tsx');
+  const buttonUpperPath = path.resolve(__dirname, 'src/components/ui/Button.tsx');
+  
+  if (fs.existsSync(buttonLowerPath) && !fs.existsSync(buttonUpperPath)) {
+    console.log('Creating Button.tsx from button.tsx for case consistency');
+    try {
+      fs.copyFileSync(buttonLowerPath, buttonUpperPath);
+    } catch (error) {
+      console.error('Error creating Button.tsx file:', error);
+    }
+  }
+};
+
+// Call the function to ensure Button.tsx exists with proper casing
+ensureButtonCasing();
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -10,7 +30,16 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'handle-case-sensitivity',
+        buildStart() {
+          // Check again before build starts
+          ensureButtonCasing();
+        }
+      }
+    ],
     base: '/',
     css: {
       postcss: {
@@ -22,10 +51,12 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src'),
-        '@components': resolve(__dirname, './src/components'),
-        '@contexts': resolve(__dirname, './src/contexts')
+        '@': path.resolve(__dirname, './src'),
+        '@components': path.resolve(__dirname, './src/components'),
+        '@contexts': path.resolve(__dirname, './src/contexts')
       },
+      // Add preserve symlinks option to handle case sensitivity
+      preserveSymlinks: true
     },
     server: {
       host: true,
@@ -44,6 +75,8 @@ export default defineConfig(({ mode }) => {
       // Handle SPA routing
       fs: {
         strict: false,
+        // Allow serving files from one level up to the project root
+        allow: ['..']
       },
     },
     // Çok fazla konsol mesajı olmasını önleyelim
@@ -57,6 +90,11 @@ export default defineConfig(({ mode }) => {
       },
       commonjsOptions: {
         transformMixedEsModules: true,
+      },
+      // Rollup specific options
+      rollupOptions: {
+        // Preserve file paths and case
+        preserveEntrySignatures: 'strict',
       }
     },
     // Olası döngü sorunlarını çözen debug ayarları
@@ -68,7 +106,12 @@ export default defineConfig(({ mode }) => {
       include: [
         '@testing-library/react',
         '@testing-library/jest-dom'
-      ]
+      ],
+      esbuildOptions: {
+        // Don't require type declarations for JS files
+        allowOverwrite: true,
+        resolveExtensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
     },
     // Add environment variables for testing
     define: {

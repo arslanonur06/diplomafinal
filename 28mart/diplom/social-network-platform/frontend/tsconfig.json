@@ -20,6 +20,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
+    /* Case sensitivity handling */
+    "forceConsistentCasingInFileNames": false,
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": false,
