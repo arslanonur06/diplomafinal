@@ -4,6 +4,10 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const appUrl = 'https://connectme-uqip.onrender.com';
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
 // Create a single supabase instance
 const supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

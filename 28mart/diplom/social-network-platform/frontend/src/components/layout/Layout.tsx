@@ -1,6 +1,7 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import Navbar from '../Navbar';
-import Sidebar, { SidebarBody } from '../ui/sidebar';  // Ensure SidebarBody is imported if needed
+import Sidebar, { SidebarBody } from '../ui/Sidebar'; // Fixed import with correct casing
 import Footer from './Footer';
 import { useTheme } from '../../contexts/ThemeContext';
 
