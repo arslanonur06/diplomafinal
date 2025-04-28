@@ -11,7 +11,7 @@ import { FaGithub, FaGoogle } from 'react-icons/fa';
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, isAuthenticated } = useAuth();
   const { language, translateText } = useLanguage();
   const [translations, setTranslations] = useState({
     signInToAccount: 'Sign in to your account',
@@ -93,6 +93,21 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  // Replace the problematic useEffect with this one
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      if (isAuthenticated) {
+        toast.success(await translateText('Login successful! Redirecting...'));
+        setLoading(false);
+        window.location.href = '/dashboard';
+      }
+    };
+
+    if (loading) {
+      checkAuthStatus();
+    }
+  }, [loading, isAuthenticated, translateText]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
@@ -159,4 +174,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage; 
+export default LoginPage;
