@@ -1,39 +1,26 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '../utils/supabaseClient';
+// Database tipi supabase.ts dosyası içinde kullanılmadığı için import'u kaldırıldı
+// import { Database } from '../types/database';
 
+// Check for environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const appUrl = 'https://connectme-uqip.onrender.com';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  console.error('Missing Supabase environment variables. Authentication will fail.');
 }
 
-// Create a single supabase instance
-const supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
-    storage: window.localStorage,
-    storageKey: 'supabase.auth.token'
-  },
-  global: {
-    headers: {
-      'X-Application-Origin': appUrl
-    }
-  }
-});
+console.log('SUPABASE: Initializing client with URL:', supabaseUrl);
 
 // Add debugging for session changes
-supabaseInstance.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange((event, session) => {
   console.log('[SUPABASE SERVICE] Auth state changed:', event);
   console.log('[SUPABASE SERVICE] Session exists:', !!session);
   console.log('[SUPABASE SERVICE] User ID:', session?.user?.id);
 });
 
-// Export a single instance
-export const supabase: SupabaseClient = supabaseInstance;
+// Export the supabase client from utils
+export { supabase };
 
 // Helper functions for common Supabase operations
 export const getCurrentUser = async () => {
@@ -548,14 +535,3 @@ export const getProfileWithConnections = async (userId: string, currentUserId: s
     return { data: null, error };
   }
 };
-
-// Configure auth behavior after client creation
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) {
-    // Set secure cookie attributes
-    document.cookie = 'sb-auth-token=true; SameSite=Strict; Secure; path=/; domain=https://connectme-uqip.onrender.com';
-  } else if (event === 'SIGNED_OUT') {
-    // Clear auth cookie
-    document.cookie = 'sb-auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=https://connectme-uqip.onrender.com';
-  }
-});

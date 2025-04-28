@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   emergencySignOut: () => void;
   signInWithGoogle: (redirectTo?: string) => Promise<{
-    data: { provider?: string; url?: string } | null;
+    data: any | null;
     error: Error | null;
   }>;
   refreshSession: () => Promise<{
@@ -517,38 +517,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Function to sign in with Google OAuth
-  const signInWithGoogle = useCallback(async () => {
+  const signInWithGoogle = useCallback(async (redirectTo?: string) => {
     try {
-      console.log('[AuthProvider] signInWithGoogle: Initiating Google OAuth...');
+      console.log('[AuthProvider] signInWithGoogle: Starting OAuth login flow');
+      
+      // Use the provided redirectTo or construct one based on current origin
+      const currentURL = window.location.origin;
+      const redirectURL = redirectTo || `${currentURL}/callback`;
+      
+      console.log(`[AuthProvider] signInWithGoogle: Using redirect URL: ${redirectURL}`);
+
+      // Store the redirect URL in localStorage so the callback page can verify it
+      localStorage.setItem('auth_redirect_url', redirectURL);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://connectme-uqip.onrender.com/auth/callback',
+          redirectTo: redirectURL,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          },
-        },
+          }
+        }
       });
-
+      
       if (error) {
         console.error('[AuthProvider] signInWithGoogle: Error', error);
-        return { 
-          data: null, 
-          error: new Error(error.message),
-        };
+        return { data: null, error };
       }
-
-      console.log('[AuthProvider] signInWithGoogle: Redirect URL:', data?.url);
-      return { 
-        data: data as { provider: string; url: string } | null, 
-        error: null,
-      };
+      
+      console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
+      return { data, error: null };
     } catch (error) {
-      console.error('[AuthProvider] signInWithGoogle: Error', error);
-      return { 
-        data: null, 
-        error: error instanceof Error ? error : new Error('Unknown error during Google sign-in'),
+      console.error('[AuthProvider] signInWithGoogle: Unexpected error', error);
+      return {
+        data: null,
+        error: error instanceof Error ? error : new Error('Unknown error during Google sign-in')
       };
     }
   }, []);

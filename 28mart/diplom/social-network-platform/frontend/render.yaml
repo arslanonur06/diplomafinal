@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: social-network-frontend
+    runtime: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: / 

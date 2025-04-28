@@ -1,8 +1,8 @@
-// Simple Express server to test serving files
+// Simple Express server for production
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 3004;
 
 // Log all requests
 app.use((req, res, next) => {
@@ -10,15 +10,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from the current directory
-app.use(express.static(__dirname));
+// Serve static files from the dist directory (Vite build output)
+app.use(express.static(path.join(__dirname, 'dist')));
 
-// Catch all route to send index.html for client-side routing
+// Catch all routes to send index.html for client-side routing
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(port, () => {
-  console.log(`Test server running at http://localhost:${port}`);
-  console.log(`Current directory: ${__dirname}`);
+  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Serving from: ${path.join(__dirname, 'dist')}`);
 }); 

@@ -1,49 +1,65 @@
 import react from '@vitejs/plugin-react';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig({
-  plugins: [react()],
-  base: '/',
-  css: {
-    postcss: {
-      plugins: [tailwindcss(), autoprefixer()],
-    },
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-    },
-  },
-  server: {
-    host: true,
-    port: Number(process.env.PORT) || 4173,
-    proxy: {
-      '/api': {
-        target: 'https://your-backend-api-url.onrender.com', // Replace with your backend API URL
-        changeOrigin: true,
-        secure: true,
-      },
-      '/translation': {
-        target: 'http://localhost:3005', // Translation server for local development
-        changeOrigin: true,
-        secure: false,
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current directory
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    plugins: [react()],
+    base: '/',
+    css: {
+      postcss: {
+        plugins: [
+          tailwindcss(),
+          autoprefixer(),
+        ],
       },
     },
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-    minify: true,
-    target: 'es2015'
-  },
-  define: {
-    'process.env': {
-      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
-      VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY,
-      VITE_GOOGLE_REDIRECT_URL: process.env.VITE_GOOGLE_REDIRECT_URL,
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+      },
     },
-  },
+    server: {
+      host: true,
+      port: 3002,
+      // CORS sorunlarını önlemek için
+      cors: true,
+      // HMR sorunu için çözüm
+      hmr: {
+        overlay: false, // Flash sorunu çözümü için HMR overlay'i devre dışı bırak
+      },
+      // Flash sorununu azaltmak için daha az güncellemelere neden olan yapılandırma
+      watch: {
+        usePolling: false,
+        interval: 1000, // dosyaları daha az sıklıkta kontrol et
+      },
+      // Handle SPA routing
+      fs: {
+        strict: false,
+      },
+    },
+    // Çok fazla konsol mesajı olmasını önleyelim
+    build: {
+      sourcemap: true,
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false, // Hata ayıklama için console.log'ları tutuyoruz ama canlıda true yapılabilir
+        },
+      },
+    },
+    // Olası döngü sorunlarını çözen debug ayarları
+    optimizeDeps: {
+      // Bağımlılıkların önceden yüklenmesini iyileştir
+      force: true,
+      // Optimization sorunlarıyla çakışan paketler
+      exclude: ['react-router-dom'],
+    },
+  };
 });

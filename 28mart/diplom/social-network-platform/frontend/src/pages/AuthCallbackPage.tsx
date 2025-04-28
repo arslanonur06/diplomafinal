@@ -1,93 +1,204 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase } from '../services/supabase'; // Use the main client now
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'; // Keep createClient for local instance if needed
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co';
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI';
+// Re-add environment variables for clarity, ensure they match .env.local
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Fallback just in case
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw'; // Fallback just in case
 
-console.log('Using Supabase URL:', SUPABASE_URL);
-console.log('Using Supabase Key:', SUPABASE_KEY);
-
+// Re-introduce the local Supabase client specifically for the manual setSession if needed
 const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: false, // Manual processing
   },
 });
 
 const AuthCallbackPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null); // Use any for complex debug object
   const navigate = useNavigate();
+
+  // Helper function to parse hash fragment
+  const parseHashFragment = (hash: string): Record<string, string> | null => {
+    if (!hash || hash.length < 2) return null;
+    
+    const fragment = hash.substring(1); // remove leading '#'
+    const pairs = fragment.split('&');
+    const result: Record<string, string> = {};
+    
+    pairs.forEach(pair => {
+      try {
+        const [key, value] = pair.split('=');
+        if (key && value) {
+          result[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, ' '));
+        }
+      } catch (e) {
+        console.warn('AuthCallback: Failed to parse key-value pair in hash:', pair, e);
+      }
+    });
+    
+    return result;
+  };
 
   useEffect(() => {
     let isMounted = true;
-
+    
     const handleCallback = async () => {
       try {
-        console.log('AuthCallbackPage: Processing OAuth callback...');
+        if (!isMounted) return;
+        setLoading(true);
+        setError(null); // Clear previous errors
+        
+        console.log('=========================');
+        console.log('AuthCallbackPage: Processing OAuth callback (Reverted Version)');
         console.log('CURRENT URL:', window.location.href);
+        console.log('URL Hash:', window.location.hash);
+        console.log('Environment check:');
+        console.log('- VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'NOT SET (Using Fallback)');
+        console.log('- VITE_SUPABASE_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET (Using Fallback)');
+        console.log('=========================');
 
-        // Log the hash fragment for debugging
-        console.log('AuthCallbackPage: Hash Fragment:', window.location.hash);
+        // Collect debug info
+        const debugData = {
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          hash: window.location.hash,
+          supabaseUrlUsed: SUPABASE_URL,
+          supabaseKeySet: !!SUPABASE_KEY,
+          userAgent: navigator.userAgent,
+          authMethodAttempted: 'None'
+        };
+        setDebugInfo(debugData);
 
-        // Log query parameters for debugging
-        const urlParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the leading '#'
-
-        const code = urlParams.get('code') || hashParams.get('code');
-        const state = urlParams.get('state') || hashParams.get('state');
-
-        console.log('AuthCallbackPage: Query Parameters:', {
-          code,
-          state,
-        });
-
-        if (!code) {
-          throw new Error('No authorization code found in the callback URL.');
+        // APPROACH 1: Check existing session (using main supabase client)
+        try {
+          debugData.authMethodAttempted = 'getSession';
+          setDebugInfo({...debugData});
+          console.log('AuthCallback: Attempt 1 - Checking existing session...');
+          const { data, error: getSessionError } = await supabase.auth.getSession();
+          
+          if (getSessionError) {
+            console.error('AuthCallback: Error getting session:', getSessionError);
+          } else if (data?.session) {
+            console.log('AuthCallback: SUCCESS (Approach 1)! Valid session detected:', data.session.user.id);
+            localStorage.setItem('auth_method', 'existing_session');
+            toast.success('Already signed in!');
+            navigate('/home', { replace: true });
+            return;
+          } else {
+            console.log('AuthCallback: No existing session found.');
+          }
+        } catch (sessionErr) {
+          console.error('AuthCallback: getSession check error:', sessionErr);
         }
-
-        // Attempt to exchange the code for a session
-        console.log('AuthCallbackPage: Attempting to exchange code for session...');
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
-
-        if (exchangeError) {
-          console.error('AuthCallbackPage: Error during exchangeCodeForSession:', exchangeError);
-          throw new Error(exchangeError.message || 'Failed to exchange code for session.');
+          
+        // APPROACH 2: Try standard code exchange (using main supabase client)
+        try {
+          debugData.authMethodAttempted = 'exchangeCodeForSession';
+          setDebugInfo({...debugData});
+          console.log('AuthCallback: Attempt 2 - Trying exchangeCodeForSession...');
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          
+          if (exchangeError) {
+            console.error('AuthCallback: Error with exchangeCodeForSession:', exchangeError);
+          } else {
+            const { data: refreshData } = await supabase.auth.getSession(); // Check session *after* exchange
+            if (refreshData?.session) {
+              console.log('AuthCallback: SUCCESS (Approach 2)! Session obtained via code exchange:', refreshData.session.user.id);
+              localStorage.setItem('auth_method', 'code_exchange');
+              toast.success('Successfully signed in!');
+              navigate('/home', { replace: true });
+              return;
+            } else {
+              console.error('AuthCallback: exchangeCodeForSession succeeded but no session found afterwards.');
+            }
+          }
+        } catch (exchangeErr) {
+          console.error('AuthCallback: exchangeCodeForSession error:', exchangeErr);
         }
-
-        // Check if the session was successfully established
-        console.log('AuthCallbackPage: Checking session...');
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError || !sessionData?.session) {
-          console.error('AuthCallbackPage: No session found after code exchange:', sessionError);
-          throw new Error('Unable to establish session. Please try logging in again.');
+        
+        // APPROACH 3: Manually process hash (using callbackSupabase client for setSession)
+        if (window.location.hash) {
+          try {
+            debugData.authMethodAttempted = 'manualHashParsing';
+            setDebugInfo({...debugData});
+            console.log('AuthCallback: Attempt 3 - Processing hash fragment...');
+            const hashParams = parseHashFragment(window.location.hash);
+            
+            if (hashParams && hashParams.access_token) {
+              console.log('AuthCallback: Found access_token in hash. Params:', Object.keys(hashParams).join(', '));
+              const sessionOptions = {
+                access_token: hashParams.access_token,
+                refresh_token: hashParams.refresh_token || ''
+              };
+              console.log('AuthCallback: Calling setSession with tokens...');
+              
+              // Use the local callbackSupabase instance here for setSession
+              const { data: sessionData, error: sessionError } = await callbackSupabase.auth.setSession(sessionOptions);
+              
+              if (sessionError) {
+                console.error('AuthCallback: Error setting session manually:', sessionError);
+                throw sessionError; // Throw to be caught by outer catch block
+              }
+              
+              if (sessionData?.session) {
+                console.log('AuthCallback: SUCCESS (Approach 3)! Session set manually:', sessionData.session.user.id);
+                localStorage.setItem('auth_method', 'manual_hash');
+                
+                // IMPORTANT: Also update the main supabase client's session
+                await supabase.auth.setSession(sessionOptions);
+                
+                toast.success('Successfully signed in!');
+                navigate('/home', { replace: true });
+                return;
+              } else {
+                 console.error('AuthCallback: Manual setSession call did not return a session.');
+              }
+            } else if (hashParams?.error) {
+               console.error('AuthCallback: Error found in hash fragment:', hashParams.error, hashParams.error_description);
+               throw new Error(`OAuth Provider Error: ${hashParams.error_description || hashParams.error}`);
+            } else {
+               console.error('AuthCallback: No access_token or error found in hash.');
+            }
+          } catch (manualErr) {
+            console.error('AuthCallback: Manual hash processing error:', manualErr);
+            // If this specific error happened, throw it so it's shown to user
+            if (manualErr instanceof Error) throw manualErr;
+          }
+        } else {
+           console.log('AuthCallback: No hash fragment present in URL.');
         }
+        
+        // If all approaches failed
+        console.error('AuthCallback: All authentication approaches failed.');
+        throw new Error('Unable to establish session. Please try logging in again.');
 
-        console.log('AuthCallbackPage: Session established successfully:', sessionData.session.user.id);
-        toast.success('Successfully signed in!');
-        navigate('/home', { replace: true });
       } catch (err: any) {
-        console.error('AuthCallbackPage: Error during callback handling:', err);
-        setError(err.message || 'An unknown error occurred during authentication.');
-      } finally {
+        console.error('AuthCallbackPage: Fatal error during callback handling:', err);
         if (isMounted) {
+          setError(err.message || 'An unknown error occurred during authentication.');
           setLoading(false);
+          // Update debug info with error
+          setDebugInfo((prev: any) => ({ ...prev, error: err.message, finalStatus: 'Failed' }));
         }
       }
     };
 
     handleCallback();
 
+    // Cleanup function
     return () => {
       isMounted = false;
+      // No timeout to clear in this version
     };
-  }, [navigate]);
+  }, [navigate]); // navigate dependency
 
+  // UI Remains similar to previous versions, showing loading or error state
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 p-4">
       <div className="text-center max-w-lg w-full">
@@ -105,7 +216,7 @@ const AuthCallbackPage: React.FC = () => {
             </svg>
             <h1 className="text-xl font-semibold text-red-600 dark:text-red-400 mt-4 mb-2">Authentication Failed</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4 whitespace-pre-wrap">{error}</p>
-            <button
+            <button 
               onClick={() => navigate('/login', { replace: true })}
               className="mt-6 px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 transition-colors"
             >
@@ -113,9 +224,18 @@ const AuthCallbackPage: React.FC = () => {
             </button>
           </>
         )}
+        {/* Optional Debug Output */}
+        {debugInfo && (
+          <details className="mt-6 text-left">
+            <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400">Show Debug Info</summary>
+            <pre className="mt-2 text-xs bg-gray-200 dark:bg-gray-800 p-3 rounded overflow-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </details>
+        )}
       </div>
     </div>
   );
 };
 
-export default AuthCallbackPage;
+export default AuthCallbackPage; 

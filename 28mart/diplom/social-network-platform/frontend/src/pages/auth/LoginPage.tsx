@@ -66,10 +66,8 @@ const LoginPage: React.FC = () => {
     console.log('Starting Google OAuth sign-in process...');
     
     try {
-
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin;
       // Use the current window origin to build the redirect URL
-      const redirectTo = `${backendUrl}/auth/callback`;
+      const redirectTo = `${window.location.origin}/callback`;
       console.log(`Using dynamic redirect URL: ${redirectTo}`);
       
       // Call the signInWithGoogle function with the dynamic redirect URL
