@@ -4,7 +4,8 @@ import { toast } from 'react-hot-toast';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { FiHash, FiUsers, FiCalendar, FiImage as FiImageIcon, FiSmile, FiTrash2, FiX, FiUserPlus } from 'react-icons/fi';
 import { supabase } from '../../services/supabase';
-import { useAuth } from '../../hooks/useAuth';
+// Change import to useAuthContext
+import { useAuthContext } from '../../contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
@@ -15,7 +16,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Button } from '../ui/Button';
+import { Button } from '../ui/Button'; // Changed from button to Button
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Post } from '../../types/supabase';
 import ProfileAvatar from '../profile/ProfileAvatar';
@@ -77,7 +78,8 @@ const SUGGESTED_HASHTAGS = [
 const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // Change useAuth to useAuthContext
+  const { user } = useAuthContext();
   const { isProfileComplete } = useProfileCompletion();
   const [content, setContent] = useState('');
   const [images, setImages] = useState<File[]>([]);

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+// Change import to useAuthContext
+import { useAuthContext } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { interestTags } from '../constants/interestTags'; // Use flat array
 import ProfileAvatar from '../components/profile/ProfileAvatar'; // Import ProfileAvatar
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/Button'; // Changed from button to Button
 
 // Suggested emojis for quick selection
 const suggestedEmojis = [
@@ -19,7 +20,8 @@ const suggestedEmojis = [
 const CompleteProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, loading: authLoading, setHasCompletedProfile, refreshUserData } = useAuth();
+  // Change useAuth to useAuthContext
+  const { user, loading: authLoading, setHasCompletedProfile, refreshUserData } = useAuthContext();
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);

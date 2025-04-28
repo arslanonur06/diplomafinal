@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom'; // Remove unused useNavigate, useLocation
+import { useAuthContext } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Link } from 'react-router-dom';
-import logo from '../../logo.svg';
+import { FaGoogle } from 'react-icons/fa'; // Only import used icons
+import { FaGithub } from 'react-icons/fa'; // Add missing GitHub icon import
+import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/input';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi';
-import { FaGithub, FaGoogle } from 'react-icons/fa';
+
+// Define the logo path
+const logoPath = '/connect-me-logo.png'; // Using a path from the public directory
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle } = useAuthContext(); 
   const { language, translateText } = useLanguage();
   const [translations, setTranslations] = useState({
     signInToAccount: 'Sign in to your account',
@@ -66,11 +67,14 @@ const LoginPage: React.FC = () => {
     console.log('Starting Google OAuth sign-in process...');
     
     try {
-      // Use the current window origin to build the redirect URL
-      const redirectTo = `${window.location.origin}/callback`;
-      console.log(`Using dynamic redirect URL: ${redirectTo}`);
+      // Use the server URL or fall back to the current origin
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin;
       
-      // Call the signInWithGoogle function with the dynamic redirect URL
+      // Use the correct and consistent callback URL
+      const redirectTo = `${backendUrl}/auth/callback`;
+      console.log(`Using redirect URL: ${redirectTo}`);
+      
+      // Call the signInWithGoogle function - let it handle the redirect
       const { error } = await signInWithGoogle(redirectTo);
       
       if (error) {
@@ -78,11 +82,8 @@ const LoginPage: React.FC = () => {
         const errorMessage = await translateText(error.message || 'Login failed. Please try again.');
         toast.error(errorMessage);
         setLoading(false);
-      } else {
-        const infoMessage = await translateText('Redirecting to Google for authentication...');
-        toast.success(infoMessage, { duration: 5000 });
-        // Keep loading true as the redirect will happen
       }
+      // No else needed - the redirect will happen in the signInWithGoogle function
     } catch (err) {
       console.error('Unexpected error during Google login initiation:', err);
       const errorMessage = await translateText('An unexpected error occurred. Please try again.');
@@ -95,7 +96,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
         <div className="flex flex-col items-center">
-          <img src={logo} alt="Logo" className="h-20 mb-4" />
+          <img src={logoPath} alt="Logo" className="h-20 mb-4" />
           <h2 className="mt-6 text-center text-3xl font-extrabold bg-gradient-to-r from-gray-700 via-indigo-500 to-rose-500 text-transparent bg-clip-text dark:from-gray-300 dark:via-indigo-400 dark:to-rose-400" data-i18n>
             {translations.signInToAccount}
           </h2>
@@ -157,4 +158,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage; 
+export default LoginPage;

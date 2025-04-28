@@ -385,4 +385,4 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   );
 };
 
-export default ProfileEditModal; 
+export default ProfileEditModal;

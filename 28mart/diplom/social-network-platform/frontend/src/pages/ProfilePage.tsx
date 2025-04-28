@@ -4,7 +4,7 @@ import {
   FiPlus, FiUser, FiUsers, FiEdit2, FiUserPlus, FiClock, 
   FiGrid, FiCalendar, FiMapPin, FiCheck, FiX, FiUserX, FiLink, FiArrowLeft
 } from 'react-icons/fi';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import ProfileAvatar from '../components/profile/ProfileAvatar';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
@@ -12,7 +12,7 @@ import PostCard from '../components/post/PostCard';
 import PostCreate from '../components/post/PostCreate';
 import { toast } from 'react-hot-toast';
 import Avatar from '../components/common/Avatar';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/Button'; // Changed from button to Button
 import { Profile } from '../types/supabase';
 import ProfileEditModal from '../components/profile/ProfileEditModal';
 import { useProfileCompletion } from '@/hooks/useProfileCompletion';
@@ -83,7 +83,7 @@ const formatDate = (dateString?: string) => {
 };
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const { t } = useLanguage();
   const { profileId } = useParams<{ profileId?: string }>();
   const { checkProfileCompletion } = useProfileCompletion();

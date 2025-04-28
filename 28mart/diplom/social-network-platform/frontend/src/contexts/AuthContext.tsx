@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode, FC } from 'react';
 import { supabase } from '../services/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   emergencySignOut: () => void;
   signInWithGoogle: (redirectTo?: string) => Promise<{
-    data: any | null;
+    data: { provider?: string; url?: string } | null;
     error: Error | null;
   }>;
   refreshSession: () => Promise<{
@@ -46,7 +46,7 @@ const enableSafariCompatibility = () => {
   }
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => { // Corrected component definition
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasCompletedProfile, setHasCompletedProfile] = useState(false);
@@ -519,131 +519,154 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to sign in with Google OAuth
   const signInWithGoogle = useCallback(async (redirectTo?: string) => {
     try {
-      console.log('[AuthProvider] signInWithGoogle: Starting OAuth login flow');
+      console.log('[AuthProvider] signInWithGoogle: Initiating Google OAuth...');
       
-      // Use the provided redirectTo or construct one based on current origin
-      const currentURL = window.location.origin;
-      const redirectURL = redirectTo || `${currentURL}/callback`;
-      
-      console.log(`[AuthProvider] signInWithGoogle: Using redirect URL: ${redirectURL}`);
-
-      // Store the redirect URL in localStorage so the callback page can verify it
-      localStorage.setItem('auth_redirect_url', redirectURL);
+      // Use the provided redirectTo or a default value
+      const finalRedirectTo = redirectTo || 'https://connectme-uqip.onrender.com/auth/callback';
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectURL,
+          redirectTo: finalRedirectTo,
+          skipBrowserRedirect: false, // Make sure browser redirection is not skipped
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          }
-        }
+          },
+        },
       });
-      
+
       if (error) {
         console.error('[AuthProvider] signInWithGoogle: Error', error);
-        return { data: null, error };
+        return { 
+          data: null, 
+          error: new Error(error.message),
+        };
       }
+
+      console.log('[AuthProvider] signInWithGoogle: Redirect URL:', data?.url);
       
-      console.log('[AuthProvider] signInWithGoogle: Successfully initiated OAuth flow');
+      // If there's a URL in the data, perform the redirect here
+      if (data?.url) {
+        window.location.href = data.url; // Complete the assignment
+      }
+
+      // Return the data and error (though redirect might happen before this)
       return { data, error: null };
-    } catch (error) {
-      console.error('[AuthProvider] signInWithGoogle: Unexpected error', error);
-      return {
-        data: null,
-        error: error instanceof Error ? error : new Error('Unknown error during Google sign-in')
+      
+    } catch (err) {
+      console.error('[AuthProvider] signInWithGoogle: Exception', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      return { 
+        data: null, 
+        error: err instanceof Error ? err : new Error(String(err)),
       };
     }
-  }, []);
+  }, []); // Added dependency array
 
-  // Emergency sign out without any async operations
-  // This can be used when the normal sign out is failing
-  const emergencySignOut = useCallback(() => {
-    try {
-      console.log('AuthProvider: Performing emergency sign out');
-      
-      // Clear auth-related local storage manually
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('supabase.auth.expires_at');
-      localStorage.removeItem('current_user');
-      localStorage.removeItem('has_session');
-      localStorage.removeItem('auth_user_id');
-      localStorage.removeItem('session_expires_at');
-      localStorage.removeItem('last_session_refresh');
-      
-      // Force user state to null
-      setUser(null);
-      setHasCompletedProfile(false);
-      
-      // Force redirect to login
-      window.location.href = '/login?emergency_logout=true';
-    } catch (e) {
-      console.error('Even emergency sign out failed:', e);
-      // Last resort - reload the page
-      window.location.reload();
-    }
-  }, []);
-
-  // Helper to redirect to home page
-  const redirectToHome = () => {
-    window.location.href = '/';
-  };
-
-  // If there's an error in initialization, show it but still render children
-  // This way the app can still function for non-authenticated parts
-  if (error) {
-    console.error('AuthProvider: Rendering with error:', error.message);
-  }
-
+  // Password update (requires token from password reset email)
   const updatePassword = async (token: string, newPassword: string) => {
     try {
-      setLoading(true);
+      // Supabase typically handles the token verification implicitly
+      // when updating the user with the new password.
+      // The token is usually part of the URL the user clicks.
+      // We need to ensure the user is on the correct page (e.g., /update-password)
+      // where the token can be extracted from the URL hash.
       
-      const { error } = await supabase.auth.updateUser({
+      // First, verify the user session using the token (this might not be needed depending on flow)
+      // const { data: { session }, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: token, type: 'recovery' });
+      // if (sessionError) throw new Error(`Invalid or expired token: ${sessionError.message}`);
+      
+      // Update the user's password
+      const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       });
       
-      if (error) {
-        throw error;
+      if (updateError) {
+        console.error('Error updating password:', updateError);
+        throw updateError;
       }
       
-      console.log('Password updated successfully');
+      console.log('Password updated successfully.');
+      
+      // Optionally sign the user out or redirect them after password update
+      // await signOut(); // Example: Sign out after update
+      // navigate('/login'); // Example: Redirect to login
+      
     } catch (err) {
-      console.error('Error updating password:', err);
+      console.error('Error in updatePassword:', err);
       setError(err instanceof Error ? err : new Error(String(err)));
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const value: AuthContextType = {
+  // Redirect to home page
+  const redirectToHome = () => {
+    // Use window.location.replace for navigation outside React Router if needed
+    window.location.replace('/home'); 
+  };
+
+  // Emergency sign out (clears local storage and redirects)
+  const emergencySignOut = () => {
+    console.warn('Performing emergency sign out...');
+    try {
+      // Clear all known Supabase/auth keys from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
+          localStorage.removeItem(key);
+        }
+      });
+      // Clear session storage too
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      // Clear cookies (basic attempt)
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+    } catch (e) {
+      console.error('Error clearing storage during emergency sign out:', e);
+    } finally {
+      // Force reload to the root path
+      window.location.href = '/';
+    }
+  };
+
+  // Define the context value
+  const value = {
     user,
-    setUser,
+    setUser, // Make sure setUser is included if needed externally
     loading,
     error,
     hasCompletedProfile,
-    setHasCompletedProfile,
+    setHasCompletedProfile, // Include setter if needed
     signUp,
     signIn,
-    signOut,
+    signOut, // Ensure this is the correct function name being exported
     emergencySignOut,
     signInWithGoogle,
-    refreshSession: checkAndRefreshSession,
+    refreshSession: checkAndRefreshSession, // Use the checkAndRefresh function
     resetPassword,
     updatePassword,
     redirectToHome,
-    refreshUserData
-  };
+    refreshUserData, // Expose the explicit refresh function
+  }; 
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  // Provide the context value to children components
+  return (
+    <AuthContext.Provider value={value}>
+      {children} 
+    </AuthContext.Provider>
+  ); // Return JSX
 };
 
-export const useAuth = () => {
+// Custom hook to use the AuthContext
+export const useAuthContext = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (context === undefined) {
+    throw new Error('useAuthContext must be used within an AuthProvider');
   }
   return context;
 };

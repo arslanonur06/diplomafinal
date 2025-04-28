@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../services/supabase';
-import { useAuth } from '../hooks/useAuth';
+// Change import to useAuthContext
+import { useAuthContext } from '../contexts/AuthContext';
 import PostCreate from '../components/post/PostCreate';
 import { FiPlus, FiHeart, FiMessageSquare, FiShare2, FiBookmark, FiSearch, FiMoreHorizontal, FiTrash2 } from 'react-icons/fi';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { formatDistanceToNow } from 'date-fns'; // For relative time
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/Button'; // Changed from button to Button
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface PostType {
@@ -199,7 +200,8 @@ const PostCard: React.FC<{
 };
 
 const HomePage = () => {
-  const { user } = useAuth();
+  // Change useAuth to useAuthContext 
+  const { user } = useAuthContext();
   const { t } = useLanguage();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);

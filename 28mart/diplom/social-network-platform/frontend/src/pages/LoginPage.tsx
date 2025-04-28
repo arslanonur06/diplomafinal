@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+// Change import to useAuthContext
+import { useAuthContext } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaArrowLeft, FaGithub } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { supabase } from '../services/supabase';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/Button'; // Changed from button to Button
 import { Input } from '../components/ui/input';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 // Import the logo from public folder instead
@@ -39,7 +40,8 @@ const EmergencySignOutSection = ({ onEmergencySignOut }: { onEmergencySignOut: (
 };
 
 const LoginPage: React.FC = () => {
-  const { signIn, signInWithGoogle, emergencySignOut } = useAuth();
+  // Change useAuth to useAuthContext
+  const { signIn, signInWithGoogle, emergencySignOut } = useAuthContext();
   const { language, translateText } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
@@ -208,6 +210,7 @@ const LoginPage: React.FC = () => {
         options: {
           redirectTo: redirectUrl,
           queryParams: {
+            access_type: 'offline',
             prompt: 'select_account'
           }
         }
