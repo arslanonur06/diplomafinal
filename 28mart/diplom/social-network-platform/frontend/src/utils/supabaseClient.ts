@@ -9,6 +9,9 @@ const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || FALLBACK_KEY;
 
+
+console.log("RUNTIME Supabase Anon Key:", import.meta.env.VITE_SUPABASE_ANON_KEY);
+
 // <<< ADD LOGGING HERE >>>
 console.log('[supabaseClient] Initializing Supabase Client...');
 console.log('[supabaseClient] VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL || 'Not found in env');
