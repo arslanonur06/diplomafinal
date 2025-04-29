@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiUsers, FiMessageSquare, FiSettings } from 'react-icons/fi';
 
@@ -6,6 +6,7 @@ interface SidebarProps {
   className?: string;
 }
 
+// use React.FC so TS sees JSX namespace
 const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   return (
     <div className={`sidebar ${className}`}>
@@ -25,9 +26,10 @@ interface SidebarLinkProps {
   label: string;
 }
 
+// same here
 const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label }) => {
   return (
-    <Link 
+    <Link
       to={to}
       className="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
     >
