@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js'; // Keep createClient for l
 
 // Re-add environment variables for clarity, ensure they match .env.local
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ohserebigziyxlxpkaib.supabase.co'; // Fallback just in case
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw'; // Fallback just in case
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI'
 
 // Re-introduce the local Supabase client specifically for the manual setSession if needed
 const callbackSupabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
