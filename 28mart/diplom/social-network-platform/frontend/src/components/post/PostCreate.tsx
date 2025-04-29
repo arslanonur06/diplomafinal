@@ -22,7 +22,7 @@ import { Post } from '../../types/supabase';
 import ProfileAvatar from '../profile/ProfileAvatar';
 
 interface PostCreateProps {
-  onPostCreated?: (post: Post) => void;
+  onPostCreated: (post: Post) => void; // Change from optional to required
 }
 
 interface Group {

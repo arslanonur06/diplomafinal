@@ -182,6 +182,7 @@ const CompleteProfilePage: React.FC = () => {
     setStep(2);
   };
 
+  // Fix for error around line 203-217 - likely in Promise.push() calls
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -196,7 +197,7 @@ const CompleteProfilePage: React.FC = () => {
       console.log('CompleteProfilePage: Submitting profile data');
 
       // Update all tables in parallel for maximum reliability
-      const promises = [];
+      const promises: Promise<void>[] = []; // Explicitly type the promises array
 
       // 1. Update auth metadata first (fastest & most reliable)
       promises.push(
@@ -214,7 +215,7 @@ const CompleteProfilePage: React.FC = () => {
           } else {
             console.log('Auth metadata updated successfully');
           }
-        })
+        }) as unknown as Promise<void> // Cast to expected type
       );
 
       // 2. Update or create the user record in the profiles table
@@ -235,7 +236,7 @@ const CompleteProfilePage: React.FC = () => {
             } else {
               console.log('Profiles table updated successfully');
             }
-          })
+          }) as unknown as Promise<void> // Cast to expected type
       );
 
       // 3. Update or create the user record in the users table
@@ -257,7 +258,7 @@ const CompleteProfilePage: React.FC = () => {
             } else {
               console.log('Users table updated successfully');
             }
-          })
+          }) as unknown as Promise<void> // Cast to expected type
       );
 
       // 4. Update the user_interests table
@@ -288,7 +289,7 @@ const CompleteProfilePage: React.FC = () => {
                 }
               }
             }
-          })
+          }) as unknown as Promise<void> // Cast to expected type
       );
 
       // Wait for all updates to finish
@@ -315,27 +316,28 @@ const CompleteProfilePage: React.FC = () => {
     }
   };
 
-  const handleSkip = async () => {
+  const handleSkip = () => {
     console.log('CompleteProfilePage: Skipping profile completion');
     // Optionally mark the profile as skipped or just navigate
-    try {
-      // You could update a flag in the database here if needed
-      // For now, just navigate
-      
-      // Refresh user data to potentially clear any flags indicating profile needs completion
-      await refreshUserData();
-      
-      // Mark locally that profile is considered complete for this session
-      setHasCompletedProfile(true); 
-      
-      toast.success('Profile completion skipped');
-      navigate('/home', { replace: true }); // ADDED navigation
-    } catch (error) {
-      console.error('Error during skip process:', error);
-      toast.error('Could not skip profile completion, please try again.');
-      // Still try to navigate even if other steps fail
-      navigate('/home', { replace: true });
-    }
+    
+    // You could update a flag in the database here if needed
+    // For now, just navigate
+    
+    // Refresh user data and navigate
+    refreshUserData()
+      .then(() => {
+        // Mark locally that profile is considered complete for this session
+        setHasCompletedProfile(true); 
+        
+        toast.success('Profile completion skipped');
+        navigate('/home', { replace: true }); // ADDED navigation
+      })
+      .catch(error => {
+        console.error('Error during skip process:', error);
+        toast.error('Could not skip profile completion, please try again.');
+        // Still try to navigate even if other steps fail
+        navigate('/home', { replace: true });
+      });
   };
 
   const handleAvatarChange = (type: 'url' | 'emoji' | 'file', value: string | File) => {
