@@ -3,7 +3,7 @@ import { Database } from '../types/database';
 
 // Default fallback values for development/testing
 const FALLBACK_URL = 'https://ohserebigziyxlxpkaib.supabase.co';
-const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw';
+const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI';
 
 // Get environment variables - use explicit strings if empty
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
@@ -38,14 +38,14 @@ const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       'apikey': supabaseAnonKey, // Explicitly add API key to all requests
     },
     /* Temporarily comment out the custom fetch override for debugging */
-    fetch: (...args) => {
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       // Override fetch to add retry logic and better error handling
       try {
         // Log the request for debugging
-        console.log('[Supabase Fetch] Request type:', typeof args[0]);
+        console.log('[Supabase Fetch] Request type:', typeof input);
         
         // Don't try to parse URLs - just ensure API key is in headers
-        const request = args[0];
+        const request = input;
         
         // Add API key to headers for all requests
         if (request instanceof Request) {
@@ -65,14 +65,20 @@ const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
             integrity: request.integrity,
           });
           
-          args[0] = newRequest;
+          input = newRequest;
+        } else if (init && typeof init === 'object') {
+          // For URL strings with init object, add API key to headers
+          init.headers = {
+            ...(init.headers || {}),
+            'apikey': supabaseAnonKey
+          };
         }
       } catch (error) {
         console.error('[Supabase Fetch] Error processing request:', error);
         // Continue with original request if processing fails
       }
       
-      return fetch(...args).then(response => {
+      return fetch(input, init).then(response => {
         if (!response.ok) {
           console.warn(`[Supabase Fetch] Non-OK response: ${response.status} ${response.statusText}`);
           

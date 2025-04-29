@@ -48,14 +48,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       'Access-Control-Allow-Origin': '*',
       'apikey': supabaseAnonKey, // Explicitly add API key to all requests
     },
-    fetch: (...args) => {
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       // Override fetch to add retry logic and better error handling
       try {
         // Log the request for debugging
-        console.log('[Supabase Fetch] Request type:', typeof args[0]);
+        console.log('[Supabase Fetch] Request type:', typeof input);
         
         // Don't try to parse URLs - just ensure API key is in headers
-        const request = args[0];
+        const request = input;
         
         // Add API key to headers for all requests
         if (request instanceof Request) {
@@ -75,14 +75,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
             integrity: request.integrity,
           });
           
-          args[0] = newRequest;
+          input = newRequest;
         }
       } catch (error) {
         console.error('[Supabase Fetch] Error processing request:', error);
         // Continue with original request if processing fails
       }
       
-      return fetch(...args).then(response => {
+      return fetch(input, init).then(response => {
         if (!response.ok) {
           console.warn(`[Supabase Fetch] Non-OK response: ${response.status} ${response.statusText}`);
           
@@ -156,4 +156,4 @@ if (typeof window !== 'undefined') {
       }
     });
   }, 1000);
-} 
+}
