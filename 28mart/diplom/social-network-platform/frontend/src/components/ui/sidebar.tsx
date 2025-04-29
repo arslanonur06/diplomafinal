@@ -1,11 +1,10 @@
-"use client"; // Bu satır projeniz SPA ise gereksiz olabilir, sorun devam ederse kaldırılabilir.
+"use client";
 
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import React, { useState, createContext, useContext, useEffect, LegacyRef, Key, TransitionEventHandler } from "react"; // Gerekli tipleri ekledik
-import { AnimatePresence, motion, MotionValue, MotionStyle } from "framer-motion"; // Gerekli tipleri ekledik
+import React, { useState, createContext, useContext, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 interface Links {
   label: string;
@@ -72,49 +71,142 @@ export default function Sidebar({
   );
 }
 
-// Define base props excluding 'key' for spreading
-type MotionDivPropsWithoutKey = Omit<React.ComponentProps<typeof motion.div>, 'key'>;
-type DivPropsWithoutKey = Omit<React.ComponentProps<'div'>, 'key'>;
+// Define interface for shared props
+interface SidebarComponentProps {
+  className?: string;
+  children?: React.ReactNode;
+}
 
-// SafeChildren component with modified type to handle MotionValue types
-// Accept both ReactNode and MotionValue types explicitly
-const SafeChildren: React.FC<{
-  children: React.ReactNode | MotionValue<number> | MotionValue<string> | Array<React.ReactNode | MotionValue<number> | MotionValue<string>>;
-}> = ({ children }) => {
-  // Helper function to safely render children that might include MotionValue<number/string>
-  const renderSafeChildren = () => {
-    // For arrays, render each child separately
-    if (Array.isArray(children)) {
-      return children.map((child, index) => {
-        if (
-          typeof child === 'object' && 
-          child !== null && 
-          'get' in child && 
-          'set' in child
-        ) {
-          // This is likely a MotionValue, render its current value
-          return <React.Fragment key={index}>{String(child.get())}</React.Fragment>;
-        }
-        // Normal React child
-        return <React.Fragment key={index}>{child as React.ReactNode}</React.Fragment>;
-      });
-    }
-    
-    // Single child that might be a MotionValue
-    if (
-      typeof children === 'object' && 
-      children !== null && 
-      'get' in children &&
-      'set' in children
-    ) {
-      // This is likely a MotionValue, render its current value
-      return String(children.get());
-    }
-    
-    // Normal React child
-    return children as React.ReactNode;
-  };
+// Rewritten SidebarBody component
+export const SidebarBody: React.FC<SidebarComponentProps> = (props) => {
+  const { className, children } = props;
   
-  // Return the rendered children (this was missing)
-  return <>{renderSafeChildren()}</>;
+  return (
+    <>
+      <DesktopSidebar className={className}>
+        {children}
+      </DesktopSidebar>
+      <MobileSidebar className={className}>
+        {children}
+      </MobileSidebar>
+    </>
+  );
+};
+
+// Rewritten DesktopSidebar component
+export const DesktopSidebar: React.FC<SidebarComponentProps> = (props) => {
+  const { className, children } = props;
+  
+  return (
+    <motion.div
+      className={cn(
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        className
+      )}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// Rewritten MobileSidebar component
+export const MobileSidebar: React.FC<SidebarComponentProps> = (props) => {
+  const { className, children } = props;
+  const { open, setOpen } = useSidebar();
+
+  return (
+    <>
+      <div
+        className={cn(
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+        )}
+      >
+        <div className="flex justify-end z-20 w-full">
+          <Menu
+            className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
+            onClick={() => setOpen(!open)}
+          />
+        </div>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ x: "-100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
+              className={cn(
+                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-800 p-10 z-[100] flex flex-col justify-between",
+                className
+              )}
+            >
+              <div
+                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                onClick={() => setOpen(!open)}
+              >
+                <X />
+              </div>
+              {children}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
+  );
+};
+
+export const SidebarLink = ({
+  link,
+  className,
+  ...props
+}: {
+  link: Links;
+  className?: string;
+  [key: string]: any;
+}) => {
+  const { open, animate } = useSidebar();
+  const [isActive, setIsActive] = useState(false);
+  
+  useEffect(() => {
+    const checkActive = () => {
+      const pathname = window.location.pathname;
+      if (pathname === link.href || pathname.startsWith(`${link.href}/`)) {
+        setIsActive(true);
+      } else {
+        setIsActive(false);
+      }
+    };
+    
+    checkActive();
+    window.addEventListener('popstate', checkActive);
+    return () => window.removeEventListener('popstate', checkActive);
+  }, [link.href]);
+  
+  return (
+    <Link
+      to={link.href}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2 px-3 rounded-lg",
+        isActive ? "bg-gradient-to-r from-gray-200 to-rose-200 dark:from-gray-800 dark:to-rose-900 text-gray-800 dark:text-rose-100 font-medium" : 
+        "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-gradient-to-r hover:from-gray-100 hover:to-rose-100 dark:hover:from-black dark:hover:to-rose-900/40",
+        className
+      )}
+      {...props}
+    >
+      <div className={isActive ? "text-rose-600 dark:text-rose-300" : ""}>
+        {link.icon}
+      </div>
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+      >
+        {link.label}
+      </motion.span>
+    </Link>
+  );
 };
