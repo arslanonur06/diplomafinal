@@ -1,18 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
-
+// path importuna gerek kalmaz (eğer başka yerde kullanmıyorsan)
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@components": path.resolve(__dirname, "./src/components"),
-      "@contexts": path.resolve(__dirname, "./src/contexts"),
-    },
-  },
+  plugins: [
+    react(),
+    tsconfigPaths() // Eklentiyi buraya ekle
+  ],
+  // resolve.alias bloğunu kaldırabilirsin
   build: {
     outDir: "dist",
     sourcemap: true,
