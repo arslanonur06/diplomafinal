@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Default fallback values for development/testing
 const FALLBACK_URL = 'https://ohserebigziyxlxpkaib.supabase.co';
-const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI3NDk0MTAsImV4cCI6MjAyODMyNTQxMH0.2mVOdgG-4QPVjVxqKshjFmcAyVELY6KYHtqlR-KLpvw';
+const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI';
 
 // Get environment variables - use explicit strings if empty
 let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
