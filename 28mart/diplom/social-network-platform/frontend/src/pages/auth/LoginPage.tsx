@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Remove unused useNavigate, useLocation
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { FaGoogle } from 'react-icons/fa'; // Only import used icons
 import { FaGithub } from 'react-icons/fa'; // Add missing GitHub icon import
@@ -12,7 +12,7 @@ const logoPath = '/connect-me-logo.png'; // Using a path from the public directo
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const { signInWithGoogle } = useAuthContext(); 
+  const { signInWithGoogle } = useAuth(); 
   const { language, translateText } = useLanguage();
   const [translations, setTranslations] = useState({
     signInToAccount: 'Sign in to your account',
