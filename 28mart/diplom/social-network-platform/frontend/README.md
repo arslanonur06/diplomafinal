@@ -153,10 +153,31 @@ When adding new features:
 
 If you encounter authentication problems:
 
-1. Check that your `.env.local` file contains the correct Supabase URL and key with the `VITE_` prefix
-2. Ensure the Supabase client is properly initialized in `src/utils/supabaseClient.ts`
-3. Clear local storage in your browser to reset any corrupted session data
-4. Check browser console for error messages related to authentication
+1.  **Check Environment Variables**:
+    *   Ensure your `.env.local` (for local development) or Render environment variables contain the correct `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+    *   Verify the `VITE_` prefix is used for variables accessed in the frontend code (`import.meta.env.VITE_...`).
+    *   On Render, ensure variables are set for the correct service and environment, and restart the service after changes.
+2.  **Supabase Client**: Ensure the Supabase client is properly initialized in `src/services/supabase.ts` (or your client file).
+3.  **Clear Browser Data**: Clear local storage and cookies in your browser to reset any potentially corrupted session data.
+4.  **Check Console**: Look for specific error messages in the browser's developer console.
+
+### Google Sign-In Issues ("Invalid API Key" or similar)
+
+If Google Sign-In fails, especially on deployment (like Render):
+
+1.  **Supabase Google Provider Config**:
+    *   Go to your Supabase Project -> Authentication -> Providers -> Google.
+    *   Ensure it's **Enabled**.
+    *   Verify the **Client ID** and **Client Secret** exactly match the credentials from your Google Cloud Console project.
+    *   **Crucially**: Copy the **Redirect URI** provided by Supabase (it looks like `https://<your-project-ref>.supabase.co/auth/v1/callback`).
+2.  **Google Cloud Console Config**:
+    *   Go to Google Cloud Console -> APIs & Services -> Credentials.
+    *   Select the OAuth 2.0 Client ID used for your web application.
+    *   Under **Authorized JavaScript origins**, add your frontend's URL (e.g., `http://localhost:5174` for local dev, `https://your-app-name.onrender.com` for production).
+    *   Under **Authorized redirect URIs**, **add the exact Redirect URI copied from the Supabase Google Provider settings**.
+3.  **API Enablement**: In Google Cloud Console, ensure the "Google Identity Platform" or necessary OAuth APIs are enabled for your project.
+4.  **Environment Variables**: Remember, Google Sign-In primarily relies on the Client ID/Secret configured *within Supabase*. The frontend only needs the `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for Supabase to handle the OAuth flow. The `VITE_GOOGLE_TRANSLATE_API_KEY` is **not** used for sign-in.
+5.  **Render Environment**: Double-check that `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are correctly set in your Render service's environment variables.
 
 ### Group and Chat Issues
 

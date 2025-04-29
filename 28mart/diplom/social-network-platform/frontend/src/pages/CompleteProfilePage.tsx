@@ -212,6 +212,8 @@ const CompleteProfilePage: React.FC = () => {
         }).then(({ error }) => {
           if (error) {
             console.error('Error updating auth metadata:', error);
+            // Optionally throw error to make Promise.allSettled catch it as rejected
+            // throw error;
           } else {
             console.log('Auth metadata updated successfully');
           }
@@ -233,6 +235,8 @@ const CompleteProfilePage: React.FC = () => {
           .then(({ error }) => {
             if (error) {
               console.error('Error updating profiles table:', error);
+              // Optionally throw error
+              // throw error;
             } else {
               console.log('Profiles table updated successfully');
             }
@@ -250,11 +254,13 @@ const CompleteProfilePage: React.FC = () => {
             avatar_emoji: selectedEmoji,
             interests: selectedInterests,
             profile_completed: true,
-            email: user.email
+            email: user.email // Ensure email is included if needed
           }, { onConflict: 'id' })
           .then(({ error }) => {
             if (error) {
               console.error('Error updating users table:', error);
+              // Optionally throw error
+              // throw error;
             } else {
               console.log('Users table updated successfully');
             }
@@ -262,7 +268,7 @@ const CompleteProfilePage: React.FC = () => {
       );
 
       // 4. Update the user_interests table
-      // Delete existing interests first
+      // Delete existing interests first, then insert new ones
       promises.push(
         supabase
           .from('user_interests')
@@ -271,6 +277,8 @@ const CompleteProfilePage: React.FC = () => {
           .then(async ({ error: deleteError }) => {
             if (deleteError) {
               console.error('Error deleting existing interests:', deleteError);
+              // Optionally throw error
+              // throw deleteError;
             } else {
               console.log('Existing interests deleted successfully');
               // Insert new interests if any are selected
@@ -284,6 +292,8 @@ const CompleteProfilePage: React.FC = () => {
                   .insert(interestRecords);
                 if (insertError) {
                   console.error('Error inserting new interests:', insertError);
+                  // Optionally throw error
+                  // throw insertError;
                 } else {
                   console.log('New interests inserted successfully');
                 }
@@ -296,17 +306,21 @@ const CompleteProfilePage: React.FC = () => {
       const results = await Promise.allSettled(promises);
       console.log('Profile update results:', results);
 
-      // Check if any critical updates failed
+      // Check if any critical updates failed (e.g., auth or profiles)
       const authUpdateFailed = results[0].status === 'rejected';
       const profileUpdateFailed = results[1].status === 'rejected';
-      
+      // You might want to check other promises too depending on importance
+
       if (authUpdateFailed || profileUpdateFailed) {
-        toast.error('Failed to save profile. Please try again.');
+        // Log specific errors if available
+        if (authUpdateFailed) console.error("Auth update failed:", (results[0] as PromiseRejectedResult).reason);
+        if (profileUpdateFailed) console.error("Profile update failed:", (results[1] as PromiseRejectedResult).reason);
+        toast.error('Failed to save profile completely. Please try again.');
       } else {
         setHasCompletedProfile(true);
         toast.success('Profile completed successfully!');
-        await refreshUserData();
-        navigate('/');
+        await refreshUserData(); // Refresh data after successful save
+        navigate('/home', { replace: true }); // Navigate to home after success
       }
     } catch (error) {
       console.error('Error submitting profile:', error);
@@ -318,26 +332,11 @@ const CompleteProfilePage: React.FC = () => {
 
   const handleSkip = () => {
     console.log('CompleteProfilePage: Skipping profile completion');
-    // Optionally mark the profile as skipped or just navigate
-    
-    // You could update a flag in the database here if needed
-    // For now, just navigate
-    
-    // Refresh user data and navigate
-    refreshUserData()
-      .then(() => {
-        // Mark locally that profile is considered complete for this session
-        setHasCompletedProfile(true); 
-        
-        toast.success('Profile completion skipped');
-        navigate('/home', { replace: true }); // ADDED navigation
-      })
-      .catch(error => {
-        console.error('Error during skip process:', error);
-        toast.error('Could not skip profile completion, please try again.');
-        // Still try to navigate even if other steps fail
-        navigate('/home', { replace: true });
-      });
+    // Mark locally that profile is considered complete for this session/navigation
+    setHasCompletedProfile(true);
+    // Replace toast.info with toast()
+    toast('Profile completion skipped.'); // Use base toast for neutral info
+    navigate('/home', { replace: true }); // Navigate to home
   };
 
   const handleAvatarChange = (type: 'url' | 'emoji' | 'file', value: string | File) => {
@@ -348,10 +347,13 @@ const CompleteProfilePage: React.FC = () => {
       setSelectedEmoji(value as string);
       setAvatarUrl(null);
     } else if (type === 'file') {
+      // Check if value is actually a File object
       if (value instanceof File) {
-          handleAvatarUpload(value); // Reuse existing upload logic if needed
+          handleAvatarUpload(value); // Use existing upload logic
       } else {
-          setAvatarUrl(value as string); // Assume value is URL if not File
+          // Fallback: If it's not a file, assume it's a URL (though this path might be less common)
+          console.warn("Avatar change type 'file' received non-File value:", value);
+          setAvatarUrl(value as string);
           setSelectedEmoji(null);
       }
     }

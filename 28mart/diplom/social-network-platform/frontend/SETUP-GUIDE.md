@@ -109,7 +109,7 @@ npm run dev
 ### Accessing the Application
 
 Once started, the application will be available at:
-- Frontend: http://localhost:3000 (or another port if 3000 is in use)
+- Frontend: http://localhost:5174 (or another port if 5174 is in use)
 - Translation server: http://localhost:3002
 
 ## Configuration Options
@@ -171,11 +171,29 @@ The application supports light and dark themes:
 2. Check that the translation server is running
 3. Look for errors in the translation server console
 
-#### Authentication issues
+### Authentication issues
 
-1. Ensure Supabase credentials are correct
-2. Clear browser cookies and cache
-3. Try using an incognito/private browser window
+1. Ensure Supabase credentials (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) are correct in `.env.local` or your deployment environment (e.g., Render).
+2. Verify the `VITE_` prefix is used for client-side environment variables.
+3. Clear browser cookies and cache.
+4. Try using an incognito/private browser window.
+5. Check the browser's developer console for specific errors.
+
+### Google Sign-In Specific Issues
+
+If you encounter errors like "Invalid API Key", "Redirect URI mismatch", etc., during Google Sign-In:
+
+1. **Check Supabase Google Auth Settings**:
+    * In your Supabase project dashboard: Authentication -> Providers -> Google.
+    * Confirm it's **Enabled**.
+    * Ensure the **Client ID** and **Client Secret** match your Google Cloud Console credentials.
+    * Copy the **Redirect URI** shown by Supabase (e.g., `https://<ref>.supabase.co/auth/v1/callback`).
+2. **Check Google Cloud Console Credentials**:
+    * Go to APIs & Services -> Credentials -> Your OAuth 2.0 Client ID.
+    * Add your frontend URL(s) to **Authorized JavaScript origins** (e.g., `http://localhost:5174`, `https://your-app.onrender.com`).
+    * **Crucially**: Add the **Redirect URI copied from Supabase** to the **Authorized redirect URIs** list.
+3. **Check API Enablement**: Ensure necessary Google APIs (like Identity Platform) are enabled in Google Cloud Console.
+4. **Environment Variables**: Confirm `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are correctly set where your app is running (local or Render). Google Client ID/Secret are used by Supabase backend, not directly by your Vite frontend code for the sign-in flow.
 
 ### Getting Help
 
@@ -213,4 +231,4 @@ We welcome your feedback and contributions:
 
 - Submit bug reports and feature requests in the GitHub issues
 - Contribute code by creating pull requests
-- Share your experience in the community forums 
+- Share your experience in the community forums

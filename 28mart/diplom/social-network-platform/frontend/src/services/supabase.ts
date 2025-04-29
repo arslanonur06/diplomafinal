@@ -1,16 +1,23 @@
-import { supabase } from '../utils/supabaseClient';
-// Database tipi supabase.ts dosyası içinde kullanılmadığı için import'u kaldırıldı
-// import { Database } from '../types/database';
+import { createClient } from '@supabase/supabase-js';
+// import { Database } from '../types/supabase'; // FIXME: Run Supabase CLI type generation and uncomment this line
 
-// Check for environment variables
+// Read variables using import.meta.env for Vite
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Ensure variables are loaded
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Authentication will fail.');
+  console.error('Supabase URL or Anon Key is missing. Check your .env file.');
+  // Optionally throw an error or provide default non-functional values
+  // throw new Error('Supabase URL or Anon Key is missing.');
 }
 
-console.log('SUPABASE: Initializing client with URL:', supabaseUrl);
+// Create and export the Supabase client (only export here)
+// FIXME: Remove '<any>' and use '<Database>' after running type generation and uncommenting the import
+export const supabase = createClient<any>(supabaseUrl!, supabaseAnonKey!);
+
+// Optional: Log to confirm loading (remove in production)
+// console.log('Supabase client initialized with URL:', supabaseUrl ? 'Loaded' : 'MISSING');
 
 // Add debugging for session changes
 supabase.auth.onAuthStateChange((event, session) => {
@@ -18,9 +25,6 @@ supabase.auth.onAuthStateChange((event, session) => {
   console.log('[SUPABASE SERVICE] Session exists:', !!session);
   console.log('[SUPABASE SERVICE] User ID:', session?.user?.id);
 });
-
-// Export the supabase client from utils
-export { supabase };
 
 // Helper functions for common Supabase operations
 export const getCurrentUser = async () => {

@@ -30,7 +30,7 @@ npm run dev
 This will start the development server, typically on port 5174. You can access the application at:
 
 ```
-http://localhost:3004
+http://localhost:5174
 ```
 
 ### Environment Setup
