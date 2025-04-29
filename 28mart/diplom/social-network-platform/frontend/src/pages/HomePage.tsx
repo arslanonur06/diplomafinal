@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../services/supabase';
-// Change import to useAuthContext
-import { useAuthContext } from '../contexts/AuthContext';
+// Change import to useAuth
+import { useAuth } from '../contexts/AuthContext';
 import PostCreate from '../components/post/PostCreate';
 import { FiPlus, FiHeart, FiMessageSquare, FiShare2, FiBookmark, FiSearch, FiMoreHorizontal, FiTrash2 } from 'react-icons/fi';
 import ErrorMessage from '../components/ui/ErrorMessage';
@@ -200,8 +200,8 @@ const PostCard: React.FC<{
 };
 
 const HomePage = () => {
-  // Change useAuth to useAuthContext 
-  const { user } = useAuthContext();
+  // Change useAuth to useAuth 
+  const { user } = useAuth();
   const { t } = useLanguage();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);

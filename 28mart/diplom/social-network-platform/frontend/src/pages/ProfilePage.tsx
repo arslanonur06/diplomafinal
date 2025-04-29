@@ -4,7 +4,7 @@ import {
   FiPlus, FiUser, FiUsers, FiEdit2, FiUserPlus, FiClock, 
   FiGrid, FiCalendar, FiMapPin, FiCheck, FiX, FiUserX, FiLink, FiArrowLeft
 } from 'react-icons/fi';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import ProfileAvatar from '../components/profile/ProfileAvatar';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
@@ -83,7 +83,7 @@ const formatDate = (dateString?: string) => {
 };
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const { profileId } = useParams<{ profileId?: string }>();
   const { checkProfileCompletion } = useProfileCompletion();

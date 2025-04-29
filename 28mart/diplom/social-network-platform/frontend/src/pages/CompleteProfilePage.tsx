@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Change import to useAuthContext
-import { useAuthContext } from '../contexts/AuthContext';
+// Change import to useAuth
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,8 @@ const suggestedEmojis = [
 const CompleteProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // Change useAuth to useAuthContext
-  const { user, loading: authLoading, setHasCompletedProfile, refreshUserData } = useAuthContext();
+  // Change useAuth to useAuth
+  const { user, loading: authLoading, setHasCompletedProfile, refreshUserData } = useAuth();
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);

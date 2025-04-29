@@ -694,7 +694,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 
-// Custom hook to use the AuthContext (Removed the duplicate useAuthContext)
+// Custom hook to use the AuthContext (Removed the duplicate useAuth)
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

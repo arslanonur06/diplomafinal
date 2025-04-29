@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-// Change import to useAuthContext
-import { useAuthContext } from '../contexts/AuthContext';
+// Change import to useAuth
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle, FaArrowLeft, FaGithub } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -40,8 +40,8 @@ const EmergencySignOutSection = ({ onEmergencySignOut }: { onEmergencySignOut: (
 };
 
 const LoginPage: React.FC = () => {
-  // Change useAuth to useAuthContext
-  const { signIn, signInWithGoogle, emergencySignOut } = useAuthContext();
+  // Change useAuth to useAuth
+  const { signIn, signInWithGoogle, emergencySignOut } = useAuth();
   const { language, translateText } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();

@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiImage, FiX } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
-// Change import to useAuthContext
-import { useAuthContext } from '../contexts/AuthContext';
+// Change import to useAuth
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button'; // Changed from button to Button
@@ -24,8 +24,8 @@ const CreateGroupPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  // Change useAuth to useAuthContext
-  const { user } = useAuthContext();
+  // Change useAuth to useAuth
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({

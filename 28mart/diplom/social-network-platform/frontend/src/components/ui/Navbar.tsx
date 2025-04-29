@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { FaSun, FaMoon, FaUserCircle, FaBars, FaSearch } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
-  const { user, signOut } = useAuthContext();
+  const { user, signOut } = useAuth();
   // Use only isDarkMode from ThemeContext which appears to exist
   const { isDarkMode, toggleDarkMode } = useTheme();
 

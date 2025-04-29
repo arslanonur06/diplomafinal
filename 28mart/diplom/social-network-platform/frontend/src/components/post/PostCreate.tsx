@@ -4,8 +4,8 @@ import { toast } from 'react-hot-toast';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { FiHash, FiUsers, FiCalendar, FiImage as FiImageIcon, FiSmile, FiTrash2, FiX, FiUserPlus } from 'react-icons/fi';
 import { supabase } from '../../services/supabase';
-// Change import to useAuthContext
-import { useAuthContext } from '../../contexts/AuthContext';
+// Change import to useAuth
+import { useAuth } from '../../contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
@@ -78,8 +78,8 @@ const SUGGESTED_HASHTAGS = [
 const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  // Change useAuth to useAuthContext
-  const { user } = useAuthContext();
+  // Change useAuth to useAuth
+  const { user } = useAuth();
   const { isProfileComplete } = useProfileCompletion();
   const [content, setContent] = useState('');
   const [images, setImages] = useState<File[]>([]);
