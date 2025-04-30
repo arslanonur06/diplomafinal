@@ -34,24 +34,24 @@ const MainLayout = () => {
 
   // Define navigation links with new structure
   const mainLinks = [
-    { href: '/home', label: 'nav.home', icon: <FaHome size={18} /> },
-    { href: '/profile', label: 'nav.profile', icon: <FaUser size={18} /> },
-    { href: '/groups', label: 'nav.groups', icon: <FaUsers size={18} /> },
-    { href: '/events', label: 'nav.events', icon: <FaCalendarAlt size={18} /> },
+    { href: '/home', label: 'home', icon: <FaHome size={18} /> },
+    { href: '/profile', label: 'profile', icon: <FaUser size={18} /> },
+    { href: '/groups', label: 'groups', icon: <FaUsers size={18} /> },
+    { href: '/events', label: 'events', icon: <FaCalendarAlt size={18} /> },
   ];
 
   const shortcutLinks = [
-    { href: '/friends', label: 'nav.friends', icon: <FaUserFriends size={18} /> },
-    { href: '/notifications', label: 'nav.notifications', icon: <FaBell size={18} /> },
-    { href: '/messages', label: 'nav.messages', icon: <FaComments size={18} /> },
+    { href: '/friends', label: 'friends', icon: <FaUserFriends size={18} /> },
+    { href: '/notifications', label: 'notifications', icon: <FaBell size={18} /> },
+    { href: '/messages', label: 'messages', icon: <FaComments size={18} /> },
   ];
 
   // New section for the requested links
   const resourceLinks = [
-    { href: '/discover', label: 'nav.discover', icon: <FaCompass size={18} /> },
-    { href: '/saved', label: 'nav.saved', icon: <FaBookmark size={18} /> },
-    { href: '/favorites', label: 'nav.favorites', icon: <FaStar size={18} /> },
-    { href: '/settings', label: 'nav.settings', icon: <FaCog size={18} /> },
+    { href: '/discover', label: 'discover', icon: <FaCompass size={18} /> },
+    { href: '/saved', label: 'saved', icon: <FaBookmark size={18} /> },
+    { href: '/favorites', label: 'favorites', icon: <FaStar size={18} /> },
+    { href: '/settings', label: 'settings', icon: <FaCog size={18} /> },
   ];
 
   // Handle link clicks to ensure proper state updates
