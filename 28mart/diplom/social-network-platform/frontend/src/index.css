@@ -653,3 +653,101 @@ html[lang="tr"] .translated-text {
 .animate-float-emoji {
   animation: float-emoji 8s ease-in-out forwards;
 }
+
+/* Animation for floating emojis */
+@keyframes float-up {
+  0% {
+    transform: translateY(0) rotate(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(20deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-float-emoji {
+  animation: float-up 8s ease-out forwards;
+}
+
+/* Confetti explosion animation */
+@keyframes confetti-explosion {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(45deg) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc(var(--final-x) * 0.5), calc(var(--final-y) * 0.5)) rotate(calc(45deg + 360deg)) scale(0.8);
+  }
+  100% {
+    transform: translate(var(--final-x), var(--final-y)) rotate(calc(45deg + 720deg)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Confetti shapes */
+.confetti-piece:nth-child(3n) {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Triangle */
+}
+
+.confetti-piece:nth-child(3n+1) {
+  border-radius: 50%; /* Circle */
+}
+
+.confetti-piece:nth-child(3n+2) {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Diamond */
+}
+
+/* Additional confetti shapes for the big explosion */
+.confetti-star {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); /* Star */
+}
+
+.confetti-circle {
+  border-radius: 50%; /* Circle */
+}
+
+.confetti-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Triangle */
+}
+
+.confetti-rect {
+  /* Rectangle is default */
+}
+
+/* Confetti fly-out animation for buttons */
+@keyframes confetti-fly-out {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: 
+      translate(
+        calc(-50% + (cos(calc(var(--angle))) * var(--velocity) * 100px)), 
+        calc(-50% + (sin(calc(var(--angle))) * var(--velocity) * 100px))
+      ) 
+      rotate(calc(var(--rotation-speed) * 1deg)) 
+      scale(0);
+    opacity: 0;
+  }
+}

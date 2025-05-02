@@ -1,0 +1,73 @@
+.flying-emojis-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.flying-emoji {
+  position: absolute;
+  bottom: -20px;
+  animation-name: fly-up;
+  animation-timing-function: ease-out;
+  opacity: 0;
+  transform-origin: center;
+}
+
+@keyframes fly-up {
+  0% {
+    bottom: -20px;
+    opacity: 0;
+    transform: scale(0.5) rotate(-15deg);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    bottom: 100%;
+    opacity: 0;
+    transform: scale(0.8) rotate(15deg);
+  }
+}
+
+/* Add occasional wobble animation for some emojis */
+.flying-emoji:nth-child(3n) {
+  animation-name: fly-up-wobble;
+}
+
+@keyframes fly-up-wobble {
+  0% {
+    bottom: -20px;
+    opacity: 0;
+    transform: scale(0.5) rotate(-15deg);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  40% {
+    transform: translateX(10px) rotate(5deg);
+  }
+  60% {
+    transform: translateX(-5px) rotate(-3deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(0) rotate(0);
+  }
+  100% {
+    bottom: 100%;
+    opacity: 0;
+    transform: scale(0.8) rotate(15deg);
+  }
+}

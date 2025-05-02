@@ -2,8 +2,8 @@
   "buttons": {
     "save": "Kaydet",
     "cancel": "İptal",
-    "post": "Gönder",
-    "posting": "Gönderiliyor...",
+    "post": "Paylaş",
+    "posting": "Paylaşılıyor...",
     "edit": "Düzenle",
     "delete": "Sil",
     "like": "Beğen",
@@ -106,7 +106,19 @@
     "addVideo": "Video ekle",
     "addEmoji": "Emoji ekle",
     "selectFriend": "Arkadaş ile paylaş",
-    "sharingWithFriend": "Paylaşılacak kişi"
+    "sharingWithFriend": "Paylaşılacak kişi",
+    "placeholder": "Aklınızdan ne geçiyor?",
+    "suggestedHashtags": "Önerilen Etiketler",
+    "selectGroup": "Grupta paylaş",
+    "selectEvent": "Etkinlikte paylaş",
+    "selectFriend": "Arkadaşınla paylaş",
+    "postingTo": "Paylaşılacak yer",
+    "errors": {
+      "emptyContent": "İçerik veya resim ekleyin",
+      "imageUpload": "Resim yüklenirken hata oluştu",
+      "create": "Gönderi oluşturulurken hata oluştu"
+    },
+    "success": "Gönderi başarıyla oluşturuldu!"
   },
   "errors": {
     "incompleteProfile": "Lütfen önce profilinizi tamamlayın",
@@ -316,7 +328,13 @@
     "using_mock_data": "Test Verisi Kullanılıyor",
     "use_real_data": "Gerçek Veri Kullan",
     "more_options": "Daha fazla seçenek",
-    "select_tab": "Bir sekme seçin"
+    "select_tab": "Bir sekme seçin",
+    "error": "Hata oluştu",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "search": "Ara"
   },
   "login": {
     "signIn": "Giriş Yap",
@@ -429,7 +447,7 @@
   },
   "sidebar": {
     "main": "Ana Menü",
-    "home": "Anasayfa",
+    "home": "Ana Sayfa",
     "profile": "Profil",
     "groups": "Gruplar",
     "events": "Etkinlikler",
@@ -438,7 +456,8 @@
     "messages": "Mesajlar",
     "notifications": "Bildirimler",
     "saved": "Kaydedilenler",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "logout": "Çıkış Yap"
   },
   "home": {
     "search_placeholder": "Gönderi ara...",
@@ -458,7 +477,8 @@
       "joining": "Katılınıyor...",
       "join": "Gruba Katıl",
       "chat": "Sohbet",
-      "leave": "Ayrıl"
+      "leave": "Ayrıl",
+      "findGroups": "Grupları Keşfet"
     },
     "search_placeholder": "Topluluğunu bul...",
     "category_label": "Kategori",
@@ -478,7 +498,8 @@
     "members": "üye",
     "no_groups_found_title": "Grup bulunamadı",
     "no_my_groups_message": "Henüz hiçbir gruba katılmadınız.",
-    "no_all_groups_message": "Aramanızı değiştirmeyi veya yeni bir grup oluşturmayı deneyin."
+    "no_all_groups_message": "Aramanızı değiştirmeyi veya yeni bir grup oluşturmayı deneyin.",
+    "no_groups_message": "Henüz hiçbir gruba katılmadınız."
   },
   "events": {
     "title": "Etkinlikler",
@@ -492,7 +513,8 @@
       "leave": "Ayrıl",
       "chat": "Sohbet",
       "joining": "Katılınıyor...",
-      "join": "Katıl"
+      "join": "Katıl",
+      "findEvents": "Etkinlikleri Keşfet"
     },
     "search_placeholder": "Etkinlik ara...",
     "category_label": "Kategori Seç",
@@ -513,7 +535,8 @@
     "private": "Özel",
     "no_events_found_title": "Etkinlik bulunamadı",
     "no_my_events_message": "Henüz hiçbir etkinliğe katılmadınız.",
-    "no_all_events_message": "Aramanızı değiştirmeyi veya yeni bir etkinlik oluşturmayı deneyin."
+    "no_all_events_message": "Aramanızı değiştirmeyi veya yeni bir etkinlik oluşturmayı deneyin.",
+    "no_events_message": "Henüz hiçbir etkinliğe katılmadınız."
   },
   "messages": {
     "title": "Mesajlar",
@@ -577,7 +600,9 @@
     "buttons": {
       "explore": "Daha Fazla Keşfet"
     },
-    "eventDate": "Etkinlik Tarihi"
+    "eventDate": "Etkinlik Tarihi",
+    "subtitle": "Popüler konuları ve ilginizi çekebilecek içerikleri keşfedin",
+    "trending": "Gündemde Olanlar"
   },
   "saved": {
     "title": "Kaydedilenler",
@@ -729,5 +754,16 @@
     "view_attendees_policy": "Katılımcıları görüntüle politikası",
     "delete_own_messages": "Kullanıcılar kendi mesajlarını silebilir",
     "update_own_messages": "Kullanıcılar kendi mesajlarını düzenleyebilir"
+  },
+  "auth": {
+    "login": "Giriş",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "email": "E-posta",
+    "password": "Parola",
+    "forgotPassword": "Parolanızı mı unuttunuz?",
+    "errors": {
+      "notLoggedIn": "Giriş yapmalısınız"
+    }
   }
-} 
+}

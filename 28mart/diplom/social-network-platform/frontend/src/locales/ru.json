@@ -11,7 +11,9 @@
     "using_mock_data": "Используются тестовые данные",
     "use_real_data": "Использовать реальные данные",
     "more_options": "Больше опций",
-    "select_tab": "Выберите вкладку"
+    "select_tab": "Выберите вкладку",
+    "error": "Произошла ошибка",
+    "edit": "Редактировать"
   },
   "auth": {
     "sign_in": "Войти",
@@ -28,7 +30,10 @@
     "loginWithFacebook": "Login with Facebook",
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
-    "createAccount": "Create Account"
+    "createAccount": "Create Account",
+    "errors": {
+      "notLoggedIn": "Вы должны войти в систему"
+    }
   },
   "nav": {
     "main": "Главное",
@@ -65,7 +70,7 @@
     "save": "Сохранить",
     "cancel": "Отмена",
     "post": "Опубликовать",
-    "posting": "Публикуется...",
+    "posting": "Публикация...",
     "edit": "Редактировать",
     "delete": "Удалить",
     "like": "Нравится",
@@ -168,7 +173,16 @@
     "addVideo": "Добавить видео",
     "addEmoji": "Добавить эмодзи",
     "selectFriend": "Поделиться с другом",
-    "sharingWithFriend": "Делитесь с"
+    "sharingWithFriend": "Делитесь с",
+    "placeholder": "О чем вы думаете?",
+    "suggestedHashtags": "Предлагаемые хэштеги",
+    "postingTo": "Публикация в",
+    "errors": {
+      "emptyContent": "Добавьте текст или изображение",
+      "imageUpload": "Ошибка загрузки изображения",
+      "create": "Ошибка создания публикации"
+    },
+    "success": "Публикация успешно создана!"
   },
   "errors": {
     "incompleteProfile": "Please complete your profile first",
@@ -487,7 +501,8 @@
       "joining": "Присоединение...",
       "join": "Присоединиться",
       "chat": "Чат",
-      "leave": "Покинуть"
+      "leave": "Покинуть",
+      "findGroups": "Поиск групп"
     },
     "search_placeholder": "Найдите свое сообщество...",
     "category_label": "Категория",
@@ -507,7 +522,8 @@
     "members": "участников",
     "no_groups_found_title": "Группы не найдены",
     "no_my_groups_message": "Вы еще не присоединились ни к одной группе.",
-    "no_all_groups_message": "Попробуйте изменить поиск или создать новую группу."
+    "no_all_groups_message": "Попробуйте изменить поиск или создать новую группу.",
+    "no_groups_message": "Вы еще не присоединились ни к одной группе."
   },
   "events": {
     "title": "События",
@@ -521,7 +537,8 @@
       "leave": "Покинуть",
       "chat": "Чат",
       "joining": "Присоединение...",
-      "join": "Присоединиться"
+      "join": "Присоединиться",
+      "findEvents": "Найти события"
     },
     "search_placeholder": "Поиск событий...",
     "category_label": "Выберите категорию",
@@ -542,7 +559,8 @@
     "private": "Частное",
     "no_events_found_title": "События не найдены",
     "no_my_events_message": "Вы еще не присоединились ни к одному событию.",
-    "no_all_events_message": "Попробуйте изменить поиск или создать новое событие."
+    "no_all_events_message": "Попробуйте изменить поиск или создать новое событие.",
+    "no_events_message": "Вы еще не присоединились ни к одному событию."
   },
   "messages": {
     "title": "Сообщения",
@@ -606,7 +624,9 @@
     "buttons": {
       "explore": "Исследовать больше"
     },
-    "eventDate": "Дата события"
+    "eventDate": "Дата события",
+    "subtitle": "Изучайте популярные темы и находите интересный для вас контент",
+    "trending": "Популярные темы"
   },
   "saved": {
     "title": "Сохраненное",
@@ -730,5 +750,29 @@
     "maxAttendeesPlaceholder": "Оставьте пустым для неограниченного количества",
     "createButton": "Создать событие",
     "creatingButton": "Создание события..."
-  }
-} 
+  },
+  "sidebar": {
+    "home": "Главная",
+    "profile": "Профиль",
+    "messages": "Сообщения",
+    "friends": "Друзья", 
+    "discover": "Открывать",
+    "groups": "Группы",
+    "events": "События",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "notifications": "Уведомления",
+    "saved": "Сохраненное",
+    "favorites": "Избранное",
+    "helpAndSupport": "Помощь и поддержка"
+  },
+  "settings_account": "Настройки аккаунта",
+  "profile_view": "Просмотр профиля",
+  "search_users": "Поиск пользователей",
+  "search_results": "Результаты поиска",
+  "search_posts": "Поиск постов",
+  "cancel_action": "Отменить действие",
+  "notifications_all": "Все уведомления",
+  "submit_form": "Отправить форму",
+  "delete_confirm": "Подтвердить удаление"
+}

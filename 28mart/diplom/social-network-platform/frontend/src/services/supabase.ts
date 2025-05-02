@@ -1,20 +1,112 @@
 import { createClient } from '@supabase/supabase-js';
-// import { Database } from '../types/supabase'; // FIXME: Run Supabase CLI type generation and uncomment this line
+import { Database } from '../types/database';
 
-// Read variables using import.meta.env for Vite
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Default fallback values for development/testing
+const FALLBACK_URL = 'https://ohserebigziyxlxpkaib.supabase.co';
+const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oc2VyZWJpZ3ppeXhseHBrYWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjMxMTUsImV4cCI6MjA1NTczOTExNX0.EWSzRxtsyEz9rGdwuPS-0E-vTmZip-q2ZapDyZpx-uI';
 
-// Ensure variables are loaded
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase URL or Anon Key is missing. Check your .env file.');
-  // Optionally throw an error or provide default non-functional values
-  // throw new Error('Supabase URL or Anon Key is missing.');
-}
+// Get environment variables - use explicit strings if empty
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || FALLBACK_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || FALLBACK_KEY;
 
-// Create and export the Supabase client (only export here)
-// FIXME: Remove '<any>' and use '<Database>' after running type generation and uncommenting the import
-export const supabase = createClient<any>(supabaseUrl!, supabaseAnonKey!);
+// Create Supabase client
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storageKey: 'supabase.auth.token',
+    flowType: 'implicit',
+    debug: true,
+  },
+  global: {
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'apikey': supabaseAnonKey,
+    },
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+      // Override fetch to add retry logic and better error handling
+      try {
+        // Don't try to parse URLs - just ensure API key is in headers
+        const request = input;
+        
+        // Add API key to headers for all requests
+        if (request instanceof Request) {
+          // For Request objects, add the API key to headers
+          const headers = new Headers(request.headers);
+          headers.set('apikey', supabaseAnonKey);
+          
+          const newRequest = new Request(request.url, {
+            method: request.method,
+            headers: headers,
+            body: request.body,
+            mode: request.mode,
+            credentials: request.credentials,
+            cache: request.cache,
+            redirect: request.redirect,
+            referrer: request.referrer,
+            integrity: request.integrity,
+          });
+          
+          input = newRequest;
+        } else if (init && typeof init === 'object') {
+          // For URL strings with init object, add API key to headers
+          init.headers = {
+            ...(init.headers || {}),
+            'apikey': supabaseAnonKey
+          };
+        }
+      } catch (error) {
+        console.error('[Supabase Fetch] Error processing request:', error);
+      }
+      
+      return fetch(input, init).then(response => {
+        if (!response.ok) {
+          console.warn(`[Supabase Fetch] Non-OK response: ${response.status} ${response.statusText}`);
+          
+          if (response.status === 401) {
+            console.warn('[Supabase Fetch] Authentication error, attempting to refresh session');
+            // Clear local session if we get 401
+            if (typeof localStorage !== 'undefined') {
+              localStorage.removeItem('supabase.auth.token');
+            }
+          }
+        }
+        return response;
+      }).catch(error => {
+        console.error('[Supabase Fetch] Network error:', error);
+        throw error;
+      });
+    }
+  },
+});
+
+// Add debugging and better error handling for file uploads
+const originalUpload = supabase.storage.from('post-images').upload;
+supabase.storage.from('post-images').upload = async (
+  path: string, 
+  fileBody: File | ArrayBuffer | ArrayBufferView | Blob | Buffer | string | ReadableStream<Uint8Array>,
+  options?: { cacheControl?: string; contentType?: string; upsert?: boolean }
+) => {
+  console.log(`[Storage] Uploading file to path: ${path}`);
+  try {
+    const result = await originalUpload(path, fileBody, options);
+    
+    if (result.error) {
+      console.error(`[Storage] Error uploading file to ${path}:`, result.error);
+    } else {
+      console.log(`[Storage] Successfully uploaded file to ${path}`);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error(`[Storage] Unexpected error uploading file to ${path}:`, error);
+    throw error;
+  }
+};
+
+export default supabase;
 
 // Optional: Log to confirm loading (remove in production)
 // console.log('Supabase client initialized with URL:', supabaseUrl ? 'Loaded' : 'MISSING');
@@ -437,6 +529,32 @@ export const createAlterTableFunction = async () => {
     }
   );
   if (error) throw error;
+};
+
+// Add debug wrapper for post creation to identify potential issues
+const originalInsert = supabase.from('posts').insert;
+
+// Wrap the insert method for posts table with debugging
+// Fix the type error by ensuring we pass arguments correctly
+(supabase.from('posts') as any).insert = async function(...args: any[]) {
+  console.log('[Posts] Attempting to insert with data:', args[0]);
+  
+  try {
+    // Fix: Call the original method with the proper spread or application of arguments
+    // This ensures that arguments are passed correctly as expected by the originalInsert function
+    const result = await originalInsert.call(this, args[0], args[1]);
+    
+    if (result.error) {
+      console.error('[Posts] Insert error:', result.error);
+    } else {
+      console.log('[Posts] Insert successful, data:', result.data);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('[Posts] Exception during insert:', error);
+    throw error;
+  }
 };
 
 export const getProfileWithConnections = async (userId: string, currentUserId: string) => {

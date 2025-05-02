@@ -306,7 +306,13 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
     }
 
     if (!content.trim() && images.length === 0) {
-      toast.error('Please enter some content or select images to post.');
+      toast.error(t('post.errors.emptyContent') || 'Please enter some content or select images to post.');
+      return;
+    }
+
+    // Check if user is logged in
+    if (!user) {
+      toast.error(t('auth.errors.notLoggedIn') || 'You must be logged in to create posts.');
       return;
     }
 
@@ -315,78 +321,81 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
     try {
       // Upload images to Supabase storage
       const imageUrls: string[] = [];
-      for (const image of images) {
-        const uniqueFileName = `${uuidv4()}-${image.name}`; // Ensure unique file name
-        const { data, error } = await supabase.storage
-          .from('post-images')
-          .upload(`public/${uniqueFileName}`, image); // Use unique name
-
-        if (error) {
-          console.error('Error uploading image:', error);
-          toast.error('Error uploading image.');
-          setIsSubmitting(false);
-          return;
-        }
-
-        // Use data.path instead of data.Key
-        const filePath = data?.path;
-        if (filePath) {
-          // Use publicUrl instead of publicURL
-          const { data: urlData } = supabase.storage.from('post-images').getPublicUrl(filePath);
-          if (urlData?.publicUrl) {
-            imageUrls.push(urlData.publicUrl);
-          } else {
-             console.warn(`Could not get public URL for uploaded file: ${filePath}`);
-             // Optionally handle this case, e.g., by not adding the URL or showing an error
+      
+      if (images.length > 0) {
+        for (const image of images) {
+          const uniqueFileName = `${uuidv4()}-${image.name}`;
+          
+          console.log(`Uploading image: ${uniqueFileName}`);
+          
+          // Ensure image is valid
+          if (!(image instanceof File) || image.size === 0) {
+            console.error('Invalid image file:', image);
+            continue;
           }
-        } else {
-           console.warn(`Upload successful but path not found in response for file: ${image.name}`);
-           // Optionally handle this case
+          
+          // Upload with more explicit error handling
+          try {
+            const { data, error } = await supabase.storage
+              .from('post-images')
+              .upload(`public/${uniqueFileName}`, image, {
+                cacheControl: '3600',
+                upsert: false
+              });
+
+            if (error) {
+              console.error('Error uploading image:', error);
+              toast.error(`${t('post.errors.imageUpload') || 'Error uploading image'}: ${error.message}`);
+              continue; 
+            }
+
+            if (!data || !data.path) {
+              console.error('No data returned from upload');
+              continue;
+            }
+
+            // Get public URL
+            const { data: urlData } = supabase.storage.from('post-images').getPublicUrl(data.path);
+            if (urlData?.publicUrl) {
+              console.log(`Image uploaded successfully: ${urlData.publicUrl}`);
+              imageUrls.push(urlData.publicUrl);
+            }
+          } catch (uploadError) {
+            console.error('Exception during image upload:', uploadError);
+          }
         }
       }
 
-      // Ensure hashtags are extracted correctly just before submission
+      // Extract hashtags
       const finalHashtags = content.match(/#[a-zA-Z0-9_]+/g) || [];
 
-      // Create a new post
+      // Prepare post data - use type assertion if needed
+      const postData = {
+        user_id: user.id,
+        content: content.trim(),
+        image_url: imageUrls.length > 0 ? imageUrls[0] : null,
+        hashtags: finalHashtags.length > 0 ? finalHashtags : null,
+        group_id: selectedGroup,
+        event_id: selectedEvent,
+        tagged_user_id: selectedFriend,
+        created_at: new Date().toISOString()
+      };
+
+      console.log('Creating post with data:', postData);
+
+      // Insert the post with detailed logging
       const { data: insertedPost, error: postError } = await supabase
         .from('posts')
-        .insert({
-          user_id: user?.id,
-          content: content.trim(),
-          // Adjust based on your 'posts' table schema for images
-          // Option 1: Store first image URL in a dedicated column
-          image_url: imageUrls.length > 0 ? imageUrls[0] : null,
-          // Option 2: Store all image URLs in a text[] column (if schema supports it)
-          // image_urls: imageUrls,
-          hashtags: finalHashtags.length > 0 ? finalHashtags : null, // Store hashtags array or null
-          group_id: selectedGroup,
-          event_id: selectedEvent,
-          tagged_user_id: selectedFriend, // Assuming column name is tagged_user_id
-          created_at: new Date().toISOString(), // Add created_at timestamp
-          // Add default counts if needed by schema
-          like_count: 0,
-          comment_count: 0,
-          share_count: 0,
-          save_count: 0,
-        })
-        .select(`
-          *,
-          profiles:user_id (
-            full_name,
-            avatar_url,
-            avatar_emoji
-          )
-        `) // Select related profile data
+        .insert(postData)
+        .select('*')
         .single();
-
 
       if (postError) {
         console.error('Error creating post:', postError);
-        toast.error('Error creating post.');
-        setIsSubmitting(false);
-        return;
+        throw new Error(postError.message);
       }
+
+      console.log('Post created successfully:', insertedPost);
 
       // Reset form
       setContent('');
@@ -399,19 +408,21 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       setSelectedFriend(null);
 
       // Notify parent component about the new post
-      // Ensure insertedPost matches the Post type structure
       if (insertedPost) {
-         onPostCreated(insertedPost as Post); // Cast if necessary, ensure type alignment
+        toast.success(t('post.success') || 'Post created successfully!');
+        // Use setTimeout to ensure state updates before callback
+        setTimeout(() => {
+          onPostCreated(insertedPost);
+        }, 0);
       } else {
-         console.warn("Post created but data not returned from insert.");
-         // Optionally fetch the post again or handle differently
+        console.warn("Post created but data not returned from insert");
+        toast.success(t('post.success') || 'Post created successfully!');
+        // Trigger refresh anyway
+        onPostCreated({id: 'refresh-trigger-' + Date.now()} as any);
       }
-
-
-      toast.success('Post created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating post:', error);
-      toast.error('Error creating post.');
+      toast.error(`${t('post.errors.create') || 'Error creating post'}: ${error.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }

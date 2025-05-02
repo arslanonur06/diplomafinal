@@ -4,6 +4,7 @@ import { HeroGeometric } from '../components/ui/shape-landing-hero';
 import { FiUsers, FiMessageCircle, FiCalendar, FiSave, FiHash } from 'react-icons/fi';
 import { ShinyButton } from '../components/ui/ShinyButton';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaTiktok, FaYoutube, FaTelegram, FaDiscord, FaReddit, FaSnapchat, FaWhatsapp, FaPinterest, FaSpotify, FaTwitch, FaMedium } from 'react-icons/fa';
+import ConfettiExplosion from '../components/animations/ConfettiExplosion';
 
 // Flying Social Media Icons Component
 const FlyingEmojis: React.FC = () => {
@@ -85,19 +86,14 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#030303] text-white">
+      {/* Add Confetti Explosion that triggers on load */}
+      <ConfettiExplosion autoExplode={true} delay={800} />
+      
       {/* Navigation */}
       <nav className="relative z-20 px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
-            <img 
-              src="/logo.svg" 
-              alt="ConnectMe"
-              className="h-10 w-auto"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://via.placeholder.com/40x40?text=CM';
-              }}
-            />
+           
             <span className="ml-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300">ConnectMe</span>
           </div>
           <div className="flex space-x-4">

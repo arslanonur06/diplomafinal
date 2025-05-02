@@ -29,6 +29,7 @@ interface Message {
     content: string;
     created_at: string;
     user_id: string;
+    event_id?: string; // Add this property to fix the error
     profiles: {
         full_name: string;
         avatar_url: string | null;
@@ -479,7 +480,7 @@ const EventChatPage: React.FC = () => {
         const tempId = `temp-${Date.now()}`;
         const optimisticMessage: Message = {
             id: tempId,
-            event_id: eventId, // eventId'yi ekle
+            event_id: eventId, // Now valid since we've added it to the interface
             user_id: user.id,
             content: contentToSend,
             created_at: new Date().toISOString(),

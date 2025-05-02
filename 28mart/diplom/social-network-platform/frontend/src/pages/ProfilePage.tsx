@@ -13,7 +13,7 @@ import PostCreate from '../components/post/PostCreate';
 import { toast } from 'react-hot-toast';
 import Avatar from '../components/common/Avatar';
 import { Button } from '../components/ui/Button'; // Changed from button to Button
-import { Profile } from '../types/supabase';
+import { Profile } from '../types/supabase'; // Import is now correct
 import ProfileEditModal from '../components/profile/ProfileEditModal';
 import { useProfileCompletion } from '@/hooks/useProfileCompletion';
 import { useLanguage } from '../contexts/LanguageContext';
