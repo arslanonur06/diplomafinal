@@ -300,11 +300,6 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!isProfileComplete) {
-      setShowCompleteProfileModal(true);
-      return;
-    }
-
     if (!content.trim() && images.length === 0) {
       toast.error(t('post.errors.emptyContent') || 'Please enter some content or select images to post.');
       return;
@@ -431,7 +426,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border border-gray-200 dark:border-gray-700">
       {/* Profile Completion Modal */}
-      <Dialog open={showCompleteProfileModal} onOpenChange={setShowCompleteProfileModal}>
+      <Dialog open={false} onOpenChange={setShowCompleteProfileModal}>
         {/* ... existing Dialog content ... */}
       </Dialog>
 
@@ -495,7 +490,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
         <div className="flex justify-between items-center mt-3 ml-12">
           <div className="flex space-x-2 text-gray-500 dark:text-gray-400">
             {/* Image Upload */}
-            <label htmlFor="image-upload" className={`cursor-pointer p-2 rounded-full hover:bg-green-100 dark:hover:bg-green-900/30 ${!isProfileComplete ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <label htmlFor="image-upload" className="cursor-pointer p-2 rounded-full hover:bg-green-100 dark:hover:bg-green-900/30">
               <FiImageIcon className="text-green-600 dark:text-green-400" />
             </label>
             <input
@@ -505,26 +500,42 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
               multiple
               onChange={handleImageChange}
               className="hidden"
-              disabled={!isProfileComplete || isSubmitting}
+              disabled={isSubmitting}
             />
 
-            {/* Hashtag Button (Optional - could trigger suggestions) */}
-            <button type="button" onClick={() => setShowHashtagSuggestions(!showHashtagSuggestions)} className={`p-2 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 ${!isProfileComplete ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={!isProfileComplete}>
+            {/* Hashtag Button */}
+            <button
+              type="button"
+              onClick={() => setShowHashtagSuggestions(!showHashtagSuggestions)}
+              className="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
+            >
               <FiHash className="text-blue-600 dark:text-blue-400" />
             </button>
 
             {/* Group Selector */}
-            <button type="button" onClick={() => { setShowGroupSelector(!showGroupSelector); setShowEventSelector(false); setShowFriendSelector(false); }} className={`p-2 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/30 ${!isProfileComplete ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={!isProfileComplete}>
+            <button
+              type="button"
+              onClick={() => { setShowGroupSelector(!showGroupSelector); setShowEventSelector(false); setShowFriendSelector(false); }}
+              className="p-2 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/30"
+            >
               <FiUsers className="text-purple-600 dark:text-purple-400" />
             </button>
 
             {/* Event Selector */}
-            <button type="button" onClick={() => { setShowEventSelector(!showEventSelector); setShowGroupSelector(false); setShowFriendSelector(false); }} className={`p-2 rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30 ${!isProfileComplete ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={!isProfileComplete}>
+            <button
+              type="button"
+              onClick={() => { setShowEventSelector(!showEventSelector); setShowGroupSelector(false); setShowFriendSelector(false); }}
+              className="p-2 rounded-full hover:bg-orange-100 dark:hover:bg-orange-900/30"
+            >
               <FiCalendar className="text-orange-600 dark:text-orange-400" />
             </button>
 
             {/* Friend Selector */}
-            <button type="button" onClick={() => { setShowFriendSelector(!showFriendSelector); setShowGroupSelector(false); setShowEventSelector(false); }} className={`p-2 rounded-full hover:bg-teal-100 dark:hover:bg-teal-900/30 ${!isProfileComplete ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={!isProfileComplete}>
+            <button
+              type="button"
+              onClick={() => { setShowFriendSelector(!showFriendSelector); setShowGroupSelector(false); setShowEventSelector(false); }}
+              className="p-2 rounded-full hover:bg-teal-100 dark:hover:bg-teal-900/30"
+            >
               <FiUserPlus className="text-teal-600 dark:text-teal-400" />
             </button>
 
@@ -537,7 +548,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={(!content.trim() && images.length === 0) || isSubmitting || !isProfileComplete}
+            disabled={(!content.trim() && images.length === 0) || isSubmitting}
             className="min-w-[100px]"
           >
             {isSubmitting ? (
