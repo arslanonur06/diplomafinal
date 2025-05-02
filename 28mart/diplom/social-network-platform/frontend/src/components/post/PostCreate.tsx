@@ -451,7 +451,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
             placeholder={t('post.placeholder') || "What's on your mind?"}
             className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-rose-500 focus:border-rose-500 dark:bg-gray-700 dark:text-white resize-none min-h-[60px]"
             rows={3}
-            disabled={!isProfileComplete || isSubmitting}
+            disabled={isSubmitting}
           />
         </div>
 
