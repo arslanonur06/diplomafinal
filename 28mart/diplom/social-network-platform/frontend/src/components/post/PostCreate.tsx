@@ -367,7 +367,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
 
       // Prepare post data - use type assertion if needed
       const postData = {
-        profile_id: user.id, // <-- use profile_id, not user_id
+        user_id: user.id, // <-- CHANGE THIS: use user_id, not profile_id
         content: content.trim(),
         image_url: imageUrls.length > 0 ? imageUrls[0] : null,
         created_at: new Date().toISOString()

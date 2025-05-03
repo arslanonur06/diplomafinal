@@ -464,12 +464,13 @@ export const rejectFriendRequest = async (requestId: string) => {
 };
 
 // Posts
+// This function should be consistent with the column name in the database
 export const createPost = async (content: string, userId: string, groupId?: string, imageUrl?: string, taggedUserId?: string) => {
   const { error } = await supabase
     .from('posts')
     .insert({
       content,
-      user_id: userId,
+      user_id: userId, // Make sure this is user_id, not profile_id
       group_id: groupId,
       image_url: imageUrl,
       tagged_user_id: taggedUserId
