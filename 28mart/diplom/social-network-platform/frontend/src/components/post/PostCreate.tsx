@@ -329,12 +329,13 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
             continue;
           }
           
-          // Upload with more explicit error handling
+          // Upload with more explicit error handling and content type
           try {
             const { data, error } = await supabase.storage
               .from('post-images')
               .upload(`public/${uniqueFileName}`, image, {
                 cacheControl: '3600',
+                contentType: image.type, // Explicitly set content type
                 upsert: false
               });
 
@@ -372,7 +373,8 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
         created_at: new Date().toISOString()
       };
 
-      console.log('Creating post with data:', postData);
+      // Add JSON stringify logging to verify the data is properly formatted
+      console.log('Creating post with data:', JSON.stringify(postData));
 
       // Insert the post with detailed logging
       const { data: insertedPost, error: postError } = await supabase

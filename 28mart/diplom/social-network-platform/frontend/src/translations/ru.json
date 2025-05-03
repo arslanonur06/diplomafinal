@@ -87,5 +87,25 @@
       "canada": "Канада",
       "australia": "Австралия"
     }
+  },
+  "sidebar": {
+    "home": "Главная",
+    "profile": "Профиль",
+    "messages": "Сообщения",
+    "friends": "Друзья", 
+    "discover": "Обзор",
+    "groups": "Группы",
+    "events": "События",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "notifications": "Уведомления",
+    "saved": "Сохраненное",
+    "favorites": "Избранное",
+    "helpAndSupport": "Помощь и поддержка",
+    "search": "Поиск",
+    "trending": "В тренде",
+    "myPosts": "Мои посты",
+    "darkMode": "Темная тема",
+    "lightMode": "Светлая тема"
   }
 }

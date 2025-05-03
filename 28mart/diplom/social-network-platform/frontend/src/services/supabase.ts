@@ -36,6 +36,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
           // For Request objects, add the API key to headers
           const headers = new Headers(request.headers);
           headers.set('apikey', supabaseAnonKey);
+          headers.set('Content-Type', 'application/json'); // Ensure Content-Type is set
           
           const newRequest = new Request(request.url, {
             method: request.method,
@@ -54,6 +55,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
           // For URL strings with init object, add API key to headers
           init.headers = {
             ...(init.headers || {}),
+            'Content-Type': 'application/json', // Ensure Content-Type is set
             'apikey': supabaseAnonKey
           };
         }

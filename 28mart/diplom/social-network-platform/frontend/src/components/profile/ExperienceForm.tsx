@@ -13,11 +13,9 @@ type ExperienceFormData = Omit<Experience, 'id' | 'profile_id'> & {
   profile_id?: string;
 };
 
-export const ExperienceForm: React.FC<ExperienceFormProps> = ({
-  experience,
-  onSave,
-  onCancel
-}) => {
+export const ExperienceForm: React.FC<ExperienceFormProps> = (props) => {
+  const { experience, onSave, onCancel } = props;
+  
   const [form, setForm] = useState<ExperienceFormData>(
     experience || {
       title: '',

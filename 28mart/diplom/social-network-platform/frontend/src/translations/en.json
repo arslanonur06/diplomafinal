@@ -114,5 +114,25 @@
       "canada": "Canada",
       "australia": "Australia"
     }
+  },
+  "sidebar": {
+    "home": "Home",
+    "profile": "Profile",
+    "messages": "Messages",
+    "friends": "Friends", 
+    "discover": "Discover",
+    "groups": "Groups",
+    "events": "Events",
+    "settings": "Settings",
+    "logout": "Logout",
+    "notifications": "Notifications",
+    "saved": "Saved",
+    "favorites": "Favorites",
+    "helpAndSupport": "Help & Support",
+    "search": "Search",
+    "trending": "Trending",
+    "myPosts": "My Posts",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
   }
 }

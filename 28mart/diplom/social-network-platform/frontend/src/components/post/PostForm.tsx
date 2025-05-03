@@ -13,12 +13,13 @@ interface PostFormProps {
   groupId?: string;
 }
 
-const PostForm: React.FC<PostFormProps> = ({
+// Using type assertion to fix the TypeScript inference issue
+const PostForm = ({
   onSubmit,
   onCancel,
   initialContent = '',
   groupId
-}) => {
+}: PostFormProps) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [content, setContent] = useState(initialContent);
@@ -68,9 +69,16 @@ const PostForm: React.FC<PostFormProps> = ({
       // Upload image if present
       if (imageFile) {
         const filePath = `post-images/${user?.id}/${uuidv4()}-${imageFile.name}`;
+        
+        // Set proper content type options for file upload
+        const options = {
+          cacheControl: '3600',
+          contentType: imageFile.type // Explicitly set the content type based on the file
+        };
+        
         const { error: uploadError } = await supabase.storage
           .from('posts')
-          .upload(filePath, imageFile);
+          .upload(filePath, imageFile, options);
           
         if (uploadError) {
           throw new Error(`Error uploading image: ${uploadError.message}`);
@@ -80,7 +88,7 @@ const PostForm: React.FC<PostFormProps> = ({
         imageUrl = data.publicUrl;
       }
       
-      // Submit the post
+      // Submit the post with proper content type
       await onSubmit({
         content: content.trim(),
         image_url: imageUrl || undefined
@@ -172,8 +180,4 @@ const PostForm: React.FC<PostFormProps> = ({
           </button>
         </div>
       </div>
-    </form>
-  );
-};
-
-export default PostForm;
+    </form>  );};export default PostForm as React.FC<PostFormProps>;
