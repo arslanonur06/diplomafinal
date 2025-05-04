@@ -14,7 +14,14 @@
     "deleting": "Deleting...",
     "placeholder": "What's on your mind?",
     "addImage": "Add Image",
-    "removeImage": "Remove Image"
+    "removeImage": "Remove Image",
+    "errors": {
+      "emptyContent": "Please add text or an image",
+      "imageUpload": "Error uploading image",
+      "create": "Error creating post",
+      "sessionExpired": "Session expired. Please log in again",
+      "rls": "Permission denied to create post"
+    }
   },
   "profile": {
     "fullName": "Full Name",

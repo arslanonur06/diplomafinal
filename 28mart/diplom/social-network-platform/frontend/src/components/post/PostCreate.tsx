@@ -432,9 +432,16 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
     } catch (error: any) {
       console.error('Error creating post:', error);
       
-      // Use template literals with the error message if available
-      const baseErrorMsg = t('post.errors.create') || 'Error creating post';
-      let errorMessage = `${baseErrorMsg}: ${error.message || 'Unknown error'}`;
+      // Handle different error types with appropriate translations
+      let errorMessage = '';
+      
+      if (error.message.includes('session expired') || error.message.includes('not authenticated')) {
+        errorMessage = t('post.errors.sessionExpired') || 'Session expired. Please log in again';
+      } else if (error.message.includes('policy') || error.message.includes('permission')) {
+        errorMessage = t('post.errors.rls') || 'Permission denied to create post';
+      } else {
+        errorMessage = `${t('post.errors.create') || 'Error creating post'}: ${error.message || ''}`;
+      }
       
       toast.error(errorMessage);
     } finally {
