@@ -365,15 +365,25 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       // Extract hashtags
       const finalHashtags = content.match(/#[a-zA-Z0-9_]+/g) || [];
 
-      // Prepare post data - use type assertion if needed
+      // Check if user session is still valid
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        throw new Error(t('post.errors.sessionExpired') || 'Session expired. Please log in again');
+      }
+      
+      // Confirm we're using the current user's ID
+      console.log('Current authenticated user ID:', sessionData.session.user.id);
+      console.log('Using user_id for post:', user.id);
+
+      // Prepare post data with user_id
       const postData = {
-        user_id: user.id, // <-- CHANGE THIS: use user_id, not profile_id
+        user_id: user.id,
         content: content.trim(),
         image_url: imageUrls.length > 0 ? imageUrls[0] : null,
         created_at: new Date().toISOString()
       };
 
-      // Add JSON stringify logging to verify the data is properly formatted
+      // Log for debugging
       console.log('Creating post with data:', JSON.stringify(postData));
 
       // Insert the post with detailed logging
@@ -385,6 +395,12 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
 
       if (postError) {
         console.error('Error creating post:', postError);
+        
+        // Handle specific error types with better messages
+        if (postError.code === '42501' || postError.message.includes('policy')) {
+          throw new Error(t('post.errors.rls') || 'Permission denied to create post');
+        }
+        
         throw new Error(postError.message);
       }
 
@@ -415,7 +431,12 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       }
     } catch (error: any) {
       console.error('Error creating post:', error);
-      toast.error(`${t('post.errors.create') || 'Error creating post'}: ${error.message || 'Unknown error'}`);
+      
+      // Use template literals with the error message if available
+      const baseErrorMsg = t('post.errors.create') || 'Error creating post';
+      let errorMessage = `${baseErrorMsg}: ${error.message || 'Unknown error'}`;
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

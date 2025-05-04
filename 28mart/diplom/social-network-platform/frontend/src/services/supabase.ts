@@ -466,17 +466,30 @@ export const rejectFriendRequest = async (requestId: string) => {
 // Posts
 // This function should be consistent with the column name in the database
 export const createPost = async (content: string, userId: string, groupId?: string, imageUrl?: string, taggedUserId?: string) => {
-  const { error } = await supabase
+  // First check authentication status
+  const { isAuthenticated, userId: authUserId } = await checkAuthStatus();
+  
+  if (!isAuthenticated || authUserId !== userId) {
+    throw new Error('Authentication mismatch. Please refresh and try again.');
+  }
+  
+  // Proceed with post creation
+  const { data, error } = await supabase
     .from('posts')
     .insert({
       content,
-      user_id: userId, // Make sure this is user_id, not profile_id
+      user_id: userId,
       group_id: groupId,
       image_url: imageUrl,
       tagged_user_id: taggedUserId
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+  
+  return data;
 };
 
 export const getPosts = async (groupId?: string) => {
@@ -648,6 +661,7 @@ export const getProfileWithConnections = async (userId: string, currentUserId: s
       // Still return the profile even if connection info fails
       return { 
         data: { 
+// Add a debug helper function to check authentication status
           ...profile,
           friend_status: 'error',
           friend_connection_id: null
@@ -658,5 +672,34 @@ export const getProfileWithConnections = async (userId: string, currentUserId: s
   } catch (error) {
     console.error('[getProfileWithConnections] Top-level error:', error);
     return { data: null, error };
+  }
+};
+
+export const checkAuthStatus = async () => {
+  try {
+    const sessionResponse = await supabase.auth.getSession();
+    const userResponse = await supabase.auth.getUser();
+    
+    console.log('Session check:', {
+      session: sessionResponse.data.session ? 'Active' : 'No active session',
+      sessionUserId: sessionResponse.data.session?.user?.id,
+      user: userResponse.data.user ? 'User found' : 'No user found',
+      userId: userResponse.data.user?.id,
+      sessionError: sessionResponse.error?.message,
+      userError: userResponse.error?.message
+    });
+    
+    // Also check the debug function in the database
+    const { data: debugData } = await supabase.rpc('debug_auth_id');
+    console.log('Database auth check:', debugData);
+    
+    return {
+      isAuthenticated: !!sessionResponse.data.session && !!userResponse.data.user,
+      userId: userResponse.data.user?.id,
+      sessionId: sessionResponse.data.session?.user?.id
+    };
+  } catch (error) {
+    console.error('Error checking auth status:', error);
+    return { isAuthenticated: false, userId: null, sessionId: null };
   }
 };
