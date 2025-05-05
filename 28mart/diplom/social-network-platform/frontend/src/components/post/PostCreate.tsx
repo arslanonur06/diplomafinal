@@ -368,7 +368,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       // Check if user session is still valid
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !sessionData.session) {
-        throw new Error(t('post.errors.sessionExpired') || 'Session expired. Please log in again');
+        throw new Error(t('post.errors.sessionExpired'));
       }
       
       // Confirm we're using the current user's ID
@@ -398,7 +398,7 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
         
         // Handle specific error types with better messages
         if (postError.code === '42501' || postError.message.includes('policy')) {
-          throw new Error(t('post.errors.rls') || 'Permission denied to create post');
+          throw new Error(t('post.errors.rls'));
         }
         
         throw new Error(postError.message);
@@ -436,13 +436,11 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       let errorMessage = '';
       
       if (error.message.includes('session expired') || error.message.includes('not authenticated')) {
-        errorMessage = t('post.errors.sessionExpired') || 'Session expired. Please log in again';
+        errorMessage = t('post.errors.sessionExpired');
       } else if (error.message.includes('policy') || error.message.includes('permission')) {
-        errorMessage = t('post.errors.rls') || 'Permission denied to create post';
+        errorMessage = t('post.errors.rls');
       } else {
-        // Use simple error message without templating
-        const baseError = t('post.errors.create') || 'Error creating post';
-        errorMessage = `${baseError}: ${error.message || ''}`;
+        errorMessage = `${t('post.errors.create')}: ${error.message || ''}`;
       }
       
       toast.error(errorMessage);
