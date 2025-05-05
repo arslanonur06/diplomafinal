@@ -464,7 +464,6 @@ export const rejectFriendRequest = async (requestId: string) => {
 };
 
 // Posts
-// This function should be consistent with the column name in the database
 export const createPost = async (content: string, userId: string, groupId?: string, imageUrl?: string, taggedUserId?: string) => {
   // First check authentication status
   const { isAuthenticated, userId: authUserId } = await checkAuthStatus();
@@ -473,12 +472,12 @@ export const createPost = async (content: string, userId: string, groupId?: stri
     throw new Error('Authentication mismatch. Please refresh and try again.');
   }
   
-  // Proceed with post creation
+  // Proceed with post creation using profile_id instead of user_id
   const { data, error } = await supabase
     .from('posts')
     .insert({
       content,
-      user_id: userId,
+      profile_id: userId, // CHANGE: use profile_id instead of user_id
       group_id: groupId,
       image_url: imageUrl,
       tagged_user_id: taggedUserId
@@ -661,7 +660,6 @@ export const getProfileWithConnections = async (userId: string, currentUserId: s
       // Still return the profile even if connection info fails
       return { 
         data: { 
-// Add a debug helper function to check authentication status
           ...profile,
           friend_status: 'error',
           friend_connection_id: null
