@@ -375,9 +375,9 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       console.log('Current authenticated user ID:', sessionData.session.user.id);
       console.log('Using user_id for post:', user.id);
 
-      // Prepare post data using profile_id instead of user_id
+      // Prepare post data with user_id instead of profile_id
       const postData = {
-        profile_id: user.id, // CHANGE: use profile_id instead of user_id
+        user_id: user.id, // CHANGE: use user_id instead of profile_id
         content: content.trim(),
         image_url: imageUrls.length > 0 ? imageUrls[0] : null,
         created_at: new Date().toISOString()

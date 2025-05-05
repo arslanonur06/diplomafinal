@@ -472,12 +472,12 @@ export const createPost = async (content: string, userId: string, groupId?: stri
     throw new Error('Authentication mismatch. Please refresh and try again.');
   }
   
-  // Proceed with post creation using profile_id instead of user_id
+  // Proceed with post creation using user_id instead of profile_id
   const { data, error } = await supabase
     .from('posts')
     .insert({
       content,
-      profile_id: userId, // CHANGE: use profile_id instead of user_id
+      user_id: userId, // CHANGE: use user_id instead of profile_id
       group_id: groupId,
       image_url: imageUrl,
       tagged_user_id: taggedUserId
