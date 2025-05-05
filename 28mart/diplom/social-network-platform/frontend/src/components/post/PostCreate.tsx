@@ -440,7 +440,9 @@ const PostCreate: React.FC<PostCreateProps> = ({ onPostCreated }) => {
       } else if (error.message.includes('policy') || error.message.includes('permission')) {
         errorMessage = t('post.errors.rls') || 'Permission denied to create post';
       } else {
-        errorMessage = `${t('post.errors.create') || 'Error creating post'}: ${error.message || ''}`;
+        // Use simple error message without templating
+        const baseError = t('post.errors.create') || 'Error creating post';
+        errorMessage = `${baseError}: ${error.message || ''}`;
       }
       
       toast.error(errorMessage);
