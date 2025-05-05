@@ -82,7 +82,6 @@ const PostCreate: React.FC<PostCreateProps> = (props) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isProfileComplete } = useProfileCompletion();
   const [content, setContent] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -345,11 +344,6 @@ const PostCreate: React.FC<PostCreateProps> = (props) => {
 
     if (!user) {
       toast.error(t('errors.loginRequired'));
-      return;
-    }
-
-    if (!isProfileComplete) {
-      setShowCompleteProfileModal(true);
       return;
     }
 
@@ -837,26 +831,6 @@ const PostCreate: React.FC<PostCreateProps> = (props) => {
           </div>
         )}
       </form>
-
-      {/* Profile Completion Modal */}
-      <Dialog open={showCompleteProfileModal} onOpenChange={setShowCompleteProfileModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('profile.completeTitle')}</DialogTitle>
-            <DialogDescription>
-              {t('profile.completeMessage')}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button variant="outline">{t('common.cancel')}</Button>
-            </DialogClose>
-            <Button onClick={() => { navigate('/profile'); setShowCompleteProfileModal(false); }}>
-              {t('profile.goToProfile')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
