@@ -120,7 +120,6 @@ const CreateGroupPage: React.FC = () => {
          console.warn('Exception during session refresh:', refreshErr);
       }
 
-
       console.log('Re-verifying session before insert...');
       const { data: currentSessionData, error: currentSessionError } = await supabase.auth.getSession();
 
@@ -155,7 +154,8 @@ const CreateGroupPage: React.FC = () => {
             .from('images')
             .upload(filePath, selectedImage, {
               cacheControl: '3600',
-              upsert: false
+              upsert: false,
+              contentType: selectedImage.type // Add explicit content type for the file
             });
             
           if (uploadError) {
@@ -263,12 +263,15 @@ const CreateGroupPage: React.FC = () => {
       
       // Add the creator as a member and admin
       console.log('Adding creator as member:', { group_id: newGroup.id, user_id: user.id });
-      const { error: memberError } = await supabase.rpc('create_group_member', {
-        p_group_id: newGroup.id,
-        p_user_id: user.id,
-        p_role: 'admin',
-        p_status: 'approved'
-      });
+      const { error: memberError } = await supabase.rpc(
+        'create_group_member',
+        {
+          p_group_id: newGroup.id,
+          p_user_id: user.id,
+          p_role: 'admin',
+          p_status: 'approved'
+        }
+      );
       
       if (memberError) {
         console.error('Error adding creator as member:', memberError);

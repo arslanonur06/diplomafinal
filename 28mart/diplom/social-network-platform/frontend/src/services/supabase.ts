@@ -21,7 +21,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json',  // Ensure this is properly set
+      'Accept': 'application/json',        // Add explicit Accept header
       'Access-Control-Allow-Origin': '*',
       'apikey': supabaseAnonKey,
     },
@@ -36,7 +37,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
           // For Request objects, add the API key to headers
           const headers = new Headers(request.headers);
           headers.set('apikey', supabaseAnonKey);
-          headers.set('Content-Type', 'application/json'); // Ensure Content-Type is set
+          headers.set('Content-Type', 'application/json');   // Ensure Content-Type is set
+          headers.set('Accept', 'application/json');         // Add Accept header
           
           const newRequest = new Request(request.url, {
             method: request.method,
@@ -55,7 +57,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
           // For URL strings with init object, add API key to headers
           init.headers = {
             ...(init.headers || {}),
-            'Content-Type': 'application/json', // Ensure Content-Type is set
+            'Content-Type': 'application/json',  // Ensure Content-Type is set
+            'Accept': 'application/json',        // Add Accept header
             'apikey': supabaseAnonKey
           };
         }
@@ -67,12 +70,30 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         if (!response.ok) {
           console.warn(`[Supabase Fetch] Non-OK response: ${response.status} ${response.statusText}`);
           
+          // Log the response body for debugging (only in development)
+          if (process.env.NODE_ENV !== 'production') {
+            response.clone().text().then(text => {
+              try {
+                const jsonResponse = JSON.parse(text);
+                console.warn('[Supabase Fetch] Response body:', jsonResponse);
+              } catch (e) {
+                console.warn('[Supabase Fetch] Response body (text):', text);
+              }
+            }).catch(err => {
+              console.warn('Could not read response body:', err);
+            });
+          }
+          
           if (response.status === 401) {
             console.warn('[Supabase Fetch] Authentication error, attempting to refresh session');
             // Clear local session if we get 401
             if (typeof localStorage !== 'undefined') {
               localStorage.removeItem('supabase.auth.token');
             }
+          }
+          
+          if (response.status === 406) {
+            console.warn('[Supabase Fetch] Content-Type not acceptable. Check request headers.');
           }
         }
         return response;
@@ -286,418 +307,44 @@ export const getGroups = async (category?: string) => {
 };
 
 export const getGroupById = async (id: string) => {
-  const { data, error } = await supabase
-    .from('groups')
-    .select(`
-      *,
-      group_members (
-        count
-      ),
-      posts (
-        count
-      )
-    `)
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const joinGroup = async (groupId: string, userId: string) => {
-  const { error } = await supabase
-    .from('group_members')
-    .insert({
-      group_id: groupId,
-      user_id: userId,
-      role: 'member'
-    });
-
-  if (error) throw error;
-};
-
-export const leaveGroup = async (groupId: string, userId: string) => {
-  const { error } = await supabase
-    .from('group_members')
-    .delete()
-    .eq('group_id', groupId)
-    .eq('user_id', userId);
-
-  if (error) throw error;
-};
-
-// Events
-export const getEvents = async (category?: string) => {
-  let query = supabase
-    .from('events')
-    .select(`
-      *,
-      event_attendees (
-        count
-      )
-    `);
-
-  if (category && category !== 'all') {
-    query = query.eq('category', category);
-  }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data;
-};
-
-export const getEventById = async (id: string) => {
-  const { data, error } = await supabase
-    .from('events')
-    .select(`
-      *,
-      event_attendees (
-        count
-      )
-    `)
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const joinEvent = async (eventId: string, userId: string, status: 'going' | 'maybe' = 'going') => {
-  const { error } = await supabase
-    .from('event_attendees')
-    .insert({
-      event_id: eventId,
-      user_id: userId,
-      status
-    });
-
-  if (error) throw error;
-};
-
-export const leaveEvent = async (eventId: string, userId: string) => {
-  const { error } = await supabase
-    .from('event_attendees')
-    .delete()
-    .eq('event_id', eventId)
-    .eq('user_id', userId);
-
-  if (error) throw error;
-};
-
-// Friends
-export const getFriends = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('user_connections')
-    .select('*')
-    .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-    .eq('status', 'accepted');
-
-  if (error) throw error;
-  return data;
-};
-
-export const getFriendRequests = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('user_connections')
-    .select('*')
-    .eq('friend_id', userId)
-    .eq('status', 'pending');
-
-  if (error) throw error;
-  return data;
-};
-
-export const sendFriendRequest = async (userId: string, friendId: string) => {
-  // İsteği gönder
-  const { data, error } = await supabase
-    .from('user_connections')
-    .insert({
-      user_id: userId,
-      friend_id: friendId,
-      status: 'pending'
-    })
-    .select();
-
-  if (error) throw error;
-  
-  // Kullanıcı adını al
-  const { data: userData, error: userError } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', userId)
-    .single();
-  
-  if (userError) throw userError;
-  
-  // Bildirimi oluştur
-  const { error: notificationError } = await supabase
-    .from('notifications')
-    .insert({
-      user_id: friendId, // İsteği alan kişiye bildirim
-      type: 'friend_request',
-      content: `${userData.full_name} size arkadaşlık isteği gönderdi.`,
-      read: false,
-      related_id: data[0].id
-    });
-  
-  if (notificationError) throw notificationError;
-  
-  return data[0];
-};
-
-export const acceptFriendRequest = async (requestId: string) => {
-  const { error } = await supabase
-    .from('user_connections')
-    .update({ status: 'accepted' })
-    .eq('id', requestId);
-
-  if (error) throw error;
-};
-
-export const rejectFriendRequest = async (requestId: string) => {
-  const { error } = await supabase
-    .from('user_connections')
-    .delete()
-    .eq('id', requestId);
-
-  if (error) throw error;
-};
-
-// Posts
-export const createPost = async (content: string, userId: string, groupId?: string, imageUrl?: string, taggedUserId?: string) => {
-  // First check authentication status
-  const { isAuthenticated, userId: authUserId } = await checkAuthStatus();
-  
-  if (!isAuthenticated || authUserId !== userId) {
-    throw new Error('Authentication mismatch. Please refresh and try again.');
-  }
-  
-  // Proceed with post creation using user_id (confirmed from db schema)
-  const { data, error } = await supabase
-    .from('posts')
-    .insert({
-      content,
-      user_id: userId,  // This is correct - table uses user_id
-      group_id: groupId,
-      image_url: imageUrl,
-      tagged_user_id: taggedUserId
-    });
-
-  if (error) {
-    console.error('Error creating post:', error);
-    throw error;
-  }
-  
-  return data;
-};
-
-export const getPosts = async (groupId?: string) => {
-  let query = supabase
-    .from('posts')
-    .select(`
-      *,
-      profiles (
-        full_name,
-        avatar_url
-      ),
-      likes (
-        count
-      ),
-      comments (
-        count
-      )
-    `)
-    .order('created_at', { ascending: false });
-
-  if (groupId) {
-    query = query.eq('group_id', groupId);
-  }
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data;
-};
-
-// Add tagged_user_id column to posts table
-export const addTaggedUserIdColumn = async () => {
-  const { error } = await supabase.rpc('alter_posts_table_add_tagged_user');
-  if (error) throw error;
-};
-
-// Create RPC function to add the column
-export const createAlterTableFunction = async () => {
-  const { error } = await supabase.rpc(
-    'create_alter_posts_table_function',
-    {
-      sql: `
-        CREATE OR REPLACE FUNCTION alter_posts_table_add_tagged_user()
-        RETURNS void
-        LANGUAGE plpgsql
-        SECURITY DEFINER
-        AS $$
-        BEGIN
-          ALTER TABLE posts 
-          ADD COLUMN IF NOT EXISTS tagged_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
-        END;
-        $$;
-      `
-    }
-  );
-  if (error) throw error;
-};
-
-// Add debug wrapper for post creation to identify potential issues
-const originalInsert = supabase.from('posts').insert;
-
-// Wrap the insert method for posts table with debugging
-// Fix the type error by ensuring we pass arguments correctly
-(supabase.from('posts') as any).insert = async function(...args: any[]) {
-  console.log('[Posts] Attempting to insert with data:', args[0]);
-  
   try {
-    // Fix: Call the original method with the proper spread or application of arguments
-    // This ensures that arguments are passed correctly as expected by the originalInsert function
-    const result = await originalInsert.call(this, args[0], args[1]);
-    
-    if (result.error) {
-      console.error('[Posts] Insert error:', result.error);
-    } else {
-      console.log('[Posts] Insert successful, data:', result.data);
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('[Posts] Exception during insert:', error);
-    throw error;
-  }
-};
-
-export const getProfileWithConnections = async (userId: string, currentUserId: string) => {
-  console.log(`[getProfileWithConnections] Fetching profile for userId: ${userId}, currentUserId: ${currentUserId}`);
-  
-  try {
-    // Try to call our custom RPC function
-    console.log('[getProfileWithConnections] Attempting to use RPC function...');
-    
-    try {
-      const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_user_profile_with_connections', { 
-          p_user_id: userId,
-          p_current_user_id: currentUserId
-        });
-      
-      console.log('[getProfileWithConnections] RPC response:', { data: rpcData ? 'data exists' : 'no data', error: rpcError });
-      
-      // If the RPC function exists and works, use its data
-      if (!rpcError && rpcData && rpcData.length > 0) {
-        console.log('[getProfileWithConnections] RPC function successful, returning data');
-        return { data: rpcData[0], error: null };
-      }
-      
-      if (rpcError) {
-        console.error('[getProfileWithConnections] RPC function error:', rpcError);
-      } else if (!rpcData || rpcData.length === 0) {
-        console.warn('[getProfileWithConnections] RPC function returned no data');
-      }
-    } catch (rpcCatchError) {
-      console.error('[getProfileWithConnections] RPC function exception:', rpcCatchError);
-    }
-    
-    // Fall back to the manual fetching approach
-    console.log('[getProfileWithConnections] Falling back to manual profile fetch');
-    
-    // Get the profile
-    console.log(`[getProfileWithConnections] Fetching profile for userId: ${userId}`);
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
+    const { data, error } = await supabase
+      .from('groups')
+      .select(`
+        *,
+        group_members (
+          count
+        ),
+        posts (
+          count
+        )
+      `)
+      .eq('id', id)
       .single();
-      
-    if (profileError) {
-      console.error('[getProfileWithConnections] Profile fetch error:', profileError);
-      throw profileError;
-    }
     
-    if (!profile) {
-      console.warn(`[getProfileWithConnections] No profile found for userId: ${userId}`);
-      return { data: null, error: new Error('Profile not found') };
-    }
-    
-    console.log('[getProfileWithConnections] Profile fetch successful');
-    
-    // Check for connection/friend status
-    console.log(`[getProfileWithConnections] Checking connection status between ${currentUserId} and ${userId}`);
-    try {
-      const { data: connection, error: connectionError } = await supabase
-        .from('user_connections')
-        .select('*')
-        .or(`and(user_id.eq.${currentUserId},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUserId})`)
-        .maybeSingle();
-        
-      if (connectionError) {
-        console.error('[getProfileWithConnections] Connection fetch error:', connectionError);
-      }
-      
-      console.log('[getProfileWithConnections] Connection data:', connection);
-      
-      // Combine the data
-      const friendStatus = connection ? connection.status : 'none';
-      const friendConnectionId = connection ? connection.id : null;
-      
-      console.log('[getProfileWithConnections] Returning combined profile data');
-      return { 
-        data: { 
-          ...profile,
-          friend_status: friendStatus,
-          friend_connection_id: friendConnectionId
-        }, 
-        error: null 
-      };
-    } catch (connectionFetchError) {
-      console.error('[getProfileWithConnections] Connection fetch exception:', connectionFetchError);
-      
-      // Still return the profile even if connection info fails
-      return { 
-        data: { 
-          ...profile,
-          friend_status: 'error',
-          friend_connection_id: null
-        }, 
-        error: null 
-      };
-    }
+    if (error) throw error;
+    return data;
   } catch (error) {
-    console.error('[getProfileWithConnections] Top-level error:', error);
-    return { data: null, error };
+    console.error('Error getting group by id:', error);
+    return null;
   }
 };
 
-export const checkAuthStatus = async () => {
+// Create a proper function for upserting hashtags
+export const upsertHashtags = async (hashtagEntries: { tag: string, post_count: number }[]) => {
   try {
-    const sessionResponse = await supabase.auth.getSession();
-    const userResponse = await supabase.auth.getUser();
-    
-    console.log('Session check:', {
-      session: sessionResponse.data.session ? 'Active' : 'No active session',
-      sessionUserId: sessionResponse.data.session?.user?.id,
-      user: userResponse.data.user ? 'User found' : 'No user found',
-      userId: userResponse.data.user?.id,
-      sessionError: sessionResponse.error?.message,
-      userError: userResponse.error?.message
+    const { data, error } = await supabase.rpc('upsert_hashtags', { 
+      hashtag_entries: hashtagEntries 
     });
     
-    // Also check the debug function in the database
-    const { data: debugData } = await supabase.rpc('debug_auth_id');
-    console.log('Database auth check:', debugData);
+    if (error) {
+      console.error('Error upserting hashtags:', error);
+      throw error;
+    }
     
-    return {
-      isAuthenticated: !!sessionResponse.data.session && !!userResponse.data.user,
-      userId: userResponse.data.user?.id,
-      sessionId: sessionResponse.data.session?.user?.id
-    };
+    return data;
   } catch (error) {
-    console.error('Error checking auth status:', error);
-    return { isAuthenticated: false, userId: null, sessionId: null };
+    console.error('Exception while upserting hashtags:', error);
+    throw error;
   }
 };
